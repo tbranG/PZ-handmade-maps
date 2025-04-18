@@ -1,0 +1,25 @@
+module Base 
+{
+    item AreaSketch 
+    {
+        DisplayName = Sketch: Surroundings,
+		DisplayCategory = Cartography,
+		Type = Map,
+		Weight = 0.2,
+		Icon = Paperwork_Graph_Crumpled,
+		StaticModel = Schematic,
+		WorldStaticModel = Schematic,
+		Map = CustomMap,
+    }
+
+	item HandmadeMap
+	{
+		DisplayName = Handmade map: Knox Country,
+		DisplayCategory = Cartography,
+		Type = Normal,
+		Weight = 0.5,
+		Icon = Map,
+		StaticModel = MapInHand,
+		WorldStaticModel = Map,
+	}
+}

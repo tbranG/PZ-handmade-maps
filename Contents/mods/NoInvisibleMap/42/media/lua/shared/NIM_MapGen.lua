@@ -1,0 +1,188 @@
+function NIM_GenerateMap(recipeData, character)
+    local output = recipeData:getFirstCreatedItem()
+    local playerCell = character:getCell()
+
+    local zIndex = character:getZ()
+    local outside = character:isOutside()
+    
+    local playerCanSeeOutside = character:getSquare():isAdjacentToWindow()
+
+    local pencilColor = recipeData:getAllKeepInputItems():get(0):getType()
+
+    if pencilColor == "Pen" or pencilColor == "Pencil" then
+        pencilColor = "black"
+    elseif pencilColor == "RedPen" then
+        pencilColor = "red"
+    elseif pencilColor == "BluePen" then
+        pencilColor = "blue"
+    else
+        pencilColor = "green"
+    end
+    
+    if output ~= nil then
+        if output:getMapID() == "CustomMap" then
+            local modData = output:getModData()
+
+            --defualt values
+            local minX = playerCell:getMinX() - 96
+            local minY = playerCell:getMinY() - 60
+            local maxX = playerCell:getMaxX() + 96
+            local maxY = playerCell:getMaxY() + 60
+            
+            if not outside and not playerCanSeeOutside then
+                minX = 0
+                minY = 0
+                maxX = 0
+                maxY = 0
+            end
+
+            if zIndex > 0 then
+                minX = math.ceil(minX - ((zIndex ^ 1.3) * 72))
+                minY = math.ceil(minY - ((zIndex ^ 1.3) * 56))
+                maxX = math.ceil(maxX + ((zIndex ^ 1.3) * 72))
+                maxY = math.ceil(maxY + ((zIndex ^ 1.3) * 56))
+            end
+
+            local boxTable = {
+                _minX = minX,
+                _minY = minY,
+                _maxX = maxX,
+                _maxY = maxY
+            }
+
+            modData.custoMapData = boxTable
+            modData.mapColor = pencilColor
+        end
+    end
+end
+
+function NIM_AddRegion(recipeData, character)
+    local mapData = recipeData:getAllKeepInputItems():get(0):getModData()
+    local sketch = recipeData:getAllKeepInputItems():get(1)
+
+    local mapRegions = mapData.mapRegions
+
+    local _minX = 0
+    local _minY = 0
+    local _maxX = 0
+    local _maxY = 0
+
+    local mapUI = ISMap:new(0, 0, 0, 0, sketch, 0)
+    local javaObject = UIWorldMap.new(mapUI)
+    local mapAPI = javaObject:getAPIv1()
+
+    mapUI.mapAPI = mapAPI
+    mapUI.javaObject = javaObject
+
+    LootMaps.callLua("Init", mapUI)
+    
+    local symbolsAPI = WorldMapSymbolsV1.new(javaObject, sketch:getSymbols())
+
+    if sketch:getMapID() == "CustomMap" then
+        local sketchData = sketch:getModData().custoMapData
+        _minX = sketchData._minX
+        _minY = sketchData._minY
+        _maxX = sketchData._maxX
+        _maxY = sketchData._maxY
+    else
+        _minX = mapUI.mapAPI:getMinXInSquares()
+        _minY = mapUI.mapAPI:getMinYInSquares()
+        _maxX = mapUI.mapAPI:getMaxXInSquares()
+        _maxY = mapUI.mapAPI:getMaxYInSquares()
+    end
+    
+    local n = symbolsAPI:getSymbolCount()
+    
+    for i=0, n - 1 do
+        mapData.haveNewSymbols = true
+
+        local symbol = symbolsAPI:getSymbolByIndex(i)
+
+        if symbol:isText() then
+            local mapNotes = mapData.notes
+
+            if mapNotes == nil then
+                local data = {}
+                table.insert(data, {
+                    text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
+                    x = symbol:getWorldX(),
+                    y = symbol:getWorldY(),
+                    r = symbol:getRed(),
+                    g = symbol:getGreen(),
+                    b = symbol:getBlue()
+                })
+
+                mapData.notes = data
+            else
+                table.insert(mapNotes, {
+                    text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
+                    x = symbol:getWorldX(),
+                    y = symbol:getWorldY(),
+                    r = symbol:getRed(),
+                    g = symbol:getGreen(),
+                    b = symbol:getBlue()
+                })
+            end
+        else
+            local mapSymbols = mapData.symbols
+
+            if mapSymbols == nil then
+                local data = {}
+                table.insert(data, {
+                    symbol = symbol:getSymbolID(),
+                    x = symbol:getWorldX(),
+                    y = symbol:getWorldY(),
+                    r = symbol:getRed(),
+                    g = symbol:getGreen(),
+                    b = symbol:getBlue()
+                })
+
+                mapData.symbols = data
+            else
+                table.insert(mapSymbols, {
+                    symbol = symbol:getSymbolID(),
+                    x = symbol:getWorldX(),
+                    y = symbol:getWorldY(),
+                    r = symbol:getRed(),
+                    g = symbol:getGreen(),
+                    b = symbol:getBlue()
+                })
+            end
+        end
+    end
+
+    if mapRegions == nil then
+        local data = {}
+        table.insert(data, {
+            minX = _minX,
+            minY = _minY,
+            maxX = _maxX,
+            maxY = _maxY
+        })
+        mapData.mapRegions = data
+    else
+        table.insert(mapData.mapRegions, {
+            minX = _minX,
+            minY = _minY,
+            maxX = _maxX,
+            maxY = _maxY
+        })
+    end
+end
+
+function NIM_generateWorldMapId(recipeData, character)
+    local output = recipeData:getFirstCreatedItem()
+    local modData = output:getModData()
+
+    modData.id = NIM_MapIdGenerator()
+end
+
+function NIM_MapIdGenerator()
+    local chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    local result = ''
+    for i = 1, 32 do
+        local index = ZombRand(62)
+        result = result .. chars:sub(index, index)
+    end
+    return result
+end
