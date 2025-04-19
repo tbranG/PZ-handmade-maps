@@ -1,4 +1,5 @@
-function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
+-- this function is called when the map is created. It generates it's map area and store it in it's mod data
+function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor) 
     if output ~= nil then
         if output:getMapID() == "CustomMap" then
             local modData = output:getModData()
@@ -79,7 +80,7 @@ function NIM_GenerateMapMultiColor(recipeData, character)
 end
 
 
-
+-- This function it's used when you add a loot map to your world map
 function NIM_AddRegion(recipeData, character)
     local mapData = recipeData:getAllKeepInputItems():get(0):getModData()
     local sketch = recipeData:getAllKeepInputItems():get(1)

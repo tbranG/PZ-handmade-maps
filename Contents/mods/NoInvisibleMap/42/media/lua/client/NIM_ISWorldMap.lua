@@ -244,6 +244,42 @@ function NIM_ISWorldMapOverrides()
     end
     
     -- function override
+    -- new centralize function
+    function ISWorldMap:onCenterOnPlayer()
+        if not self.character then
+            self.mapAPI:resetView()
+            return
+        end
+    
+        local playerInventory = getPlayer():getInventory()
+        local map = playerInventory:FindAll("HandmadeMap")
+    
+        if map == nil then return end
+    
+        map = map:get(0)
+        local mapData = map:getModData()
+    
+        if mapData.mapRegions == nil then return end
+        
+        local accordionId = mapData.accordionId or 1
+        local nextMap = mapData.mapRegions[accordionId]
+        local dataLen = #mapData.mapRegions
+        
+        accordionId = accordionId + 1
+
+        if accordionId > dataLen then
+            mapData.accordionId = 1
+        else
+            mapData.accordionId = accordionId
+        end
+
+        local focusX = math.floor((nextMap.minX + nextMap.maxX) / 2)
+        local focusY = math.floor((nextMap.minY + nextMap.maxY) / 2)
+    
+        self.mapAPI:centerOn(focusX, focusY)
+    end
+
+    -- function override
     -- disables player view and isometric perspective
     function ISWorldMap:new(x, y, width, height)
         local o = ISPanelJoypad.new(self, x, y, width, height)
