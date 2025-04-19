@@ -6,11 +6,29 @@ module Base
         Time = 100,
         Tags = InHandCraft,
         category = Survival,
-        OnCreate = NIM_GenerateMap,
+        OnCreate = NIM_GenerateMapSingleColor,
         inputs 
         {
             item 1 [Base.SheetPaper2],
             item 1 tags[Pen;Pencil;BluePen;RedPen;GreenPen] mode:keep,
+        }
+        outputs 
+        {
+            item 1 Base.AreaSketch,
+        }
+    }
+
+    craftRecipe CreateAreaSketch2
+    {
+        timedAction = Making,
+        Time = 100,
+        Tags = InHandCraft,
+        category = Survival,
+        OnCreate = NIM_GenerateMapMultiColor,
+        inputs 
+        {
+            item 1 [Base.SheetPaper2],
+            item 1 [Base.Crayons;Base.PenMultiColor] mode:keep,
         }
         outputs 
         {

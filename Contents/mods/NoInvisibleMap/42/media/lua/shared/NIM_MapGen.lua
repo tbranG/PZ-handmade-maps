@@ -1,24 +1,4 @@
-function NIM_GenerateMap(recipeData, character)
-    local output = recipeData:getFirstCreatedItem()
-    local playerCell = character:getCell()
-
-    local zIndex = character:getZ()
-    local outside = character:isOutside()
-    
-    local playerCanSeeOutside = character:getSquare():isAdjacentToWindow()
-
-    local pencilColor = recipeData:getAllKeepInputItems():get(0):getType()
-
-    if pencilColor == "Pen" or pencilColor == "Pencil" then
-        pencilColor = "black"
-    elseif pencilColor == "RedPen" then
-        pencilColor = "red"
-    elseif pencilColor == "BluePen" then
-        pencilColor = "blue"
-    else
-        pencilColor = "green"
-    end
-    
+function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
     if output ~= nil then
         if output:getMapID() == "CustomMap" then
             local modData = output:getModData()
@@ -55,6 +35,50 @@ function NIM_GenerateMap(recipeData, character)
         end
     end
 end
+
+
+
+function NIM_GenerateMapSingleColor(recipeData, character)
+    local output = recipeData:getFirstCreatedItem()
+    local playerCell = character:getCell()
+
+    local zIndex = character:getZ()
+    local outside = character:isOutside()
+    
+    local playerCanSeeOutside = character:getSquare():isAdjacentToWindow()
+
+    local pencilColor = recipeData:getAllKeepInputItems():get(0):getType()
+
+    if pencilColor == "Pen" or pencilColor == "Pencil" then
+        pencilColor = "black"
+    elseif pencilColor == "RedPen" then
+        pencilColor = "red"
+    elseif pencilColor == "BluePen" then
+        pencilColor = "blue"
+    else
+        pencilColor = "green"
+    end
+
+    NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
+end
+
+
+
+function NIM_GenerateMapMultiColor(recipeData, character)
+    local output = recipeData:getFirstCreatedItem()
+    local playerCell = character:getCell()
+
+    local zIndex = character:getZ()
+    local outside = character:isOutside()
+    
+    local playerCanSeeOutside = character:getSquare():isAdjacentToWindow()
+
+    local pencilColor = "multi"
+
+    NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
+end
+
+
 
 function NIM_AddRegion(recipeData, character)
     local mapData = recipeData:getAllKeepInputItems():get(0):getModData()
@@ -170,12 +194,16 @@ function NIM_AddRegion(recipeData, character)
     end
 end
 
+
+
 function NIM_generateWorldMapId(recipeData, character)
     local output = recipeData:getFirstCreatedItem()
     local modData = output:getModData()
 
     modData.id = NIM_MapIdGenerator()
 end
+
+
 
 function NIM_MapIdGenerator()
     local chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
