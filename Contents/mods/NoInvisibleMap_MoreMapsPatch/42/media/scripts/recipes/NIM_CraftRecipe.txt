@@ -1,0 +1,105 @@
+module Base 
+{
+    craftRecipe CreateAreaSketch 
+    {
+        timedAction = Making,
+        Time = 100,
+        Tags = InHandCraft,
+        category = Survival,
+        OnCreate = NIM_GenerateMapSingleColor,
+        inputs 
+        {
+            item 1 [Base.SheetPaper2],
+            item 1 tags[Pen;Pencil;BluePen;RedPen;GreenPen] mode:keep,
+        }
+        outputs 
+        {
+            item 1 Base.AreaSketch,
+        }
+    }
+
+    craftRecipe CreateAreaSketch2
+    {
+        timedAction = Making,
+        Time = 100,
+        Tags = InHandCraft,
+        category = Survival,
+        OnCreate = NIM_GenerateMapMultiColor,
+        inputs 
+        {
+            item 1 [Base.SheetPaper2],
+            item 1 [Base.Crayons;Base.PenMultiColor] mode:keep,
+        }
+        outputs 
+        {
+            item 1 Base.AreaSketch,
+        }
+    }
+
+    craftRecipe CreateHandmadeMap
+    {
+        timedAction = Making,
+        Time = 100,
+        Tags = InHandCraft,
+        category = Survival,
+        OnCreate = NIM_generateWorldMapId,
+        inputs 
+        {
+            item 4 [Base.SheetPaper2],
+            item 1 tags[Tape],
+        }
+        outputs
+        {
+            item 1 Base.HandmadeMap,
+        }
+    }
+
+    craftRecipe AddMapRegion
+    {
+        timedAction = Making,
+        Time = 200,
+        Tags = AnySurfaceCraft,
+        category = Survival,
+        OnCreate = NIM_AddRegion,
+        inputs
+        {
+            item 1 [Base.HandmadeMap] mode:keep,
+            item 1 [Base.AreaSketch;Base.MarchRidgeMap;Base.MuldraughMap;Base.RiversideMap;Base.RosewoodMap;Base.WestpointMap;Base.LouisvilleMap1;Base.LouisvilleMap2;Base.LouisvilleMap3;Base.LouisvilleMap4;Base.LouisvilleMap5;Base.LouisvilleMap6;Base.LouisvilleMap7;Base.LouisvilleMap8;Base.LouisvilleMap9] mode:keep,
+            item 1 tags[Pen;Pencil] mode:keep,
+            item 1 tags[BluePen] mode:keep,
+            item 1 tags[RedPen] mode:keep,
+            item 1 tags[GreenPen] mode:keep,
+        }
+    }
+
+    craftRecipe AddMapRegion2
+    {
+        timedAction = Making,
+        Time = 200,
+        Tags = AnySurfaceCraft,
+        category = Survival,
+        OnCreate = NIM_AddRegion,
+        inputs
+        {
+            item 1 [Base.HandmadeMap] mode:keep,
+            item 1 [Base.AreaSketch;Base.MarchRidgeMap;Base.MuldraughMap;Base.RiversideMap;Base.RosewoodMap;Base.WestpointMap;Base.LouisvilleMap1;Base.LouisvilleMap2;Base.LouisvilleMap3;Base.LouisvilleMap4;Base.LouisvilleMap5;Base.LouisvilleMap6;Base.LouisvilleMap7;Base.LouisvilleMap8;Base.LouisvilleMap9] mode:keep,
+            item 1 [Base.Crayons;Base.PenMultiColor] mode:keep,
+        }
+    }
+
+    craftRecipe TearPaper
+    {
+        timedAction = RipClothing,
+        Time = 50,
+        Tags = InHandCraft;CanBeDoneInDark,
+        category = Miscellaneous,
+        inputs
+        {
+            item 1 [Base.Notepad;Base.Notebook;Base.Journal] mode:destroy,
+        }
+        outputs
+        {
+            item 3 Base.SheetPaper2,
+        }
+    }
+}

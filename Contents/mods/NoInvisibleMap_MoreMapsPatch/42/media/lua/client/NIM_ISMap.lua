@@ -1,3 +1,4 @@
+require "ISUI/ISPanelJoypad"
 require "ISUI/Maps/ISWorldMapSymbols"
 
 -- needed vanilla data

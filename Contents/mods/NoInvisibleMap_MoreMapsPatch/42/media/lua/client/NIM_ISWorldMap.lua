@@ -1,4 +1,4 @@
-require "ISUI/Maps/ISWorldMapSymbols"
+require "ISUI/ISPanelJoypad"
 
 -- initializes world map custom data (known regions, symbols, annotations and points of interest)
 function NIM_AddMapData()
@@ -157,13 +157,6 @@ function NIM_UpdateMapData()
 end
 
 function NIM_ISWorldMapOverrides()
-    -- vanilla needed values
-    local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-    local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
-    local FONT_HGT_HANDWRITTEN = getTextManager():getFontHeight(UIFont.Handwritten)
-    local UI_BORDER_SPACING = 10
-    local BUTTON_HGT = FONT_HGT_SMALL + 6
-
     -- function override
     -- disables the perspective button
     function ISWorldMap:createChildren()

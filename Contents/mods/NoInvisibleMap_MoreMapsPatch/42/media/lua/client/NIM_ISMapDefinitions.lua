@@ -32,26 +32,11 @@ function NIM_InitWorldMap()
 end
 
 -- updates world map undiscovered area background
-function NIM_overrideWorldMapBackgroundInit()
+function NIM_overrideWorldMapBackground()
     if ISWorldMap_instance == nil then
         NIM_InitWorldMap()
     end
     
-    local mapUI = ISWorldMap_instance
-    local mapAPI = mapUI.javaObject:getAPIv1()
-
-    local cr,cg,cb = 227/255, 227/255, 227/255
-    mapAPI:setUnvisitedRGBA(cr * 0.915, cg * 0.915, cb * 0.915, 1.0)
-	mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
-end
-
-function NIM_overrideWorldMapBackgroundKeyPress(key)
-    if ISWorldMap_instance == nil then
-        NIM_InitWorldMap()
-    end
-
-    if not ISWorldMap.checkKey(key) then return end
-
     local mapUI = ISWorldMap_instance
     local mapAPI = mapUI.javaObject:getAPIv1()
 
@@ -840,5 +825,4 @@ function NIM_InitCustomMap()
 end
 
 Events.OnGameStart.Add(NIM_overrideWorldMapBackground)
-Events.OnKeyPressed.Add(NIM_overrideWorldMapBackgroundKeyPress)
 Events.OnGameStart.Add(NIM_InitCustomMap)

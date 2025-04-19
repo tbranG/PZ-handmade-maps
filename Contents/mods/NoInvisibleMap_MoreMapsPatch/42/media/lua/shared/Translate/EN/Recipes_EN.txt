@@ -1,0 +1,8 @@
+Recipes_EN = {
+    Recipe_CreateHandmadeMap = "Create Empty Map",
+    Recipe_AddMapRegion = "Add Region to Map",
+    Recipe_AddMapRegion2 = "Add Region to Map with Multi-color item",
+    Recipe_CreateAreaSketch = "Sketch the Surroundings",
+    Recipe_CreateAreaSketch2 = "Sketch the Surroundings with Multi-color item",
+    Recipe_TearPaper = "Tear Paper"
+}
