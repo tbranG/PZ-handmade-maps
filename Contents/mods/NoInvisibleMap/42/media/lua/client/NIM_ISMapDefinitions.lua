@@ -32,20 +32,9 @@ function NIM_InitWorldMap()
 end
 
 -- updates world map undiscovered area background
-function NIM_overrideWorldMapBackgroundInit()
-    if ISWorldMap_instance == nil then
-        NIM_InitWorldMap()
-    end
-    
-    local mapUI = ISWorldMap_instance
-    local mapAPI = mapUI.javaObject:getAPIv1()
-
-    local cr,cg,cb = 227/255, 227/255, 227/255
-    mapAPI:setUnvisitedRGBA(cr * 0.915, cg * 0.915, cb * 0.915, 1.0)
-	mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
-end
-
 function NIM_overrideWorldMapBackgroundKeyPress(key)
+    if not MainScreen.instance.inGame then return end
+    
     if ISWorldMap_instance == nil then
         NIM_InitWorldMap()
     end
@@ -55,8 +44,6 @@ function NIM_overrideWorldMapBackgroundKeyPress(key)
     local mapUI = ISWorldMap_instance
     local mapAPI = mapUI.javaObject:getAPIv1()
 
-    local cr,cg,cb = 227/255, 227/255, 227/255
-    mapAPI:setUnvisitedRGBA(cr * 0.915, cg * 0.915, cb * 0.915, 1.0)
 	mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
 end
 
@@ -147,8 +134,6 @@ function NIM_InitCustomMap()
             layer:addTexture(14.5, nil)
             layer:addTexture(14.5, "media/textures/worldMap/Water.png")
             layer:addTexture(MAXZ, "media/textures/worldMap/Water.png")
-    --		layer:addScale(MINZ, 4.0)
-    --		layer:addScale(MAX, 4.0)
         end
     
         layer = styleAPI:newPolygonLayer("road-trail")
@@ -316,8 +301,6 @@ function NIM_InitCustomMap()
             layer:addTexture(14.5, nil)
             layer:addTexture(14.5, "media/textures/worldMap/Water.png")
             layer:addTexture(MAXZ, "media/textures/worldMap/Water.png")
-    --		layer:addScale(MINZ, 4.0)
-    --		layer:addScale(MAX, 4.0)
         end
     
         layer = styleAPI:newPolygonLayer("road-trail")
@@ -485,8 +468,6 @@ function NIM_InitCustomMap()
             layer:addTexture(14.5, nil)
             layer:addTexture(14.5, "media/textures/worldMap/Water.png")
             layer:addTexture(MAXZ, "media/textures/worldMap/Water.png")
-    --		layer:addScale(MINZ, 4.0)
-    --		layer:addScale(MAX, 4.0)
         end
     
         layer = styleAPI:newPolygonLayer("road-trail")
@@ -654,8 +635,6 @@ function NIM_InitCustomMap()
             layer:addTexture(14.5, nil)
             layer:addTexture(14.5, "media/textures/worldMap/Water.png")
             layer:addTexture(MAXZ, "media/textures/worldMap/Water.png")
-    --		layer:addScale(MINZ, 4.0)
-    --		layer:addScale(MAX, 4.0)
         end
     
         layer = styleAPI:newPolygonLayer("road-trail")
@@ -776,6 +755,171 @@ function NIM_InitCustomMap()
         layer:addFill(MAXZ, 100, 191, 94, 255)
     end
 
+    function MapUtils.initCustomStyleColored(mapUI)
+        local mapAPI = mapUI.javaObject:getAPIv1()
+        local styleAPI = mapAPI:getStyleAPI()
+    
+        local ColorblindPatterns = getCore():getOptionColorblindPatterns()
+        mapAPI:setBoolean("ColorblindPatterns", ColorblindPatterns)
+    
+        local r,g,b = 219/255, 215/255, 192/255
+        local cr,cg,cb = 227/255, 227/255, 227/255
+        mapAPI:setBackgroundRGBA(cr, cg, cb, 1.0)
+        mapAPI:setUnvisitedRGBA(r * 0.915, g * 0.915, b * 0.915, 1.0)
+        mapAPI:setUnvisitedGridRGBA(r * 0.777, g * 0.777, b * 0.777, 1.0)
+    
+        styleAPI:clear()
+    
+        local layer = styleAPI:newPolygonLayer("forest")
+        layer:setMinZoom(13.5)
+        layer:setFilter("natural", "forest")
+        if true then
+            layer:addFill(MINZ, 198, 214, 197, 0)
+            layer:addFill(13.5, 198, 214, 197, 0)
+            layer:addFill(14, 198, 214, 197, 255)
+            layer:addFill(MAXZ, 198, 214, 197, 255)
+        else
+            layer:addFill(MINZ, 255, 255, 255, 255)
+            layer:addFill(MAXZ, 255, 255, 255, 255)
+            layer:addTexture(MINZ, "media/textures/worldMap/Grass.png")
+            layer:addTexture(MAXZ, "media/textures/worldMap/Grass.png")
+            layer:addScale(13.5, 4.0)
+            layer:addScale(MAXZ, 4.0)
+        end
+        
+        layer = styleAPI:newPolygonLayer("water")
+        layer:setMinZoom(MINZ)
+        layer:setFilter("water", "river")
+        if not WATER_TEXTURE then
+            layer:addFill(MINZ, 137, 159, 199, 255)
+            layer:addFill(MAXZ, 137, 159, 199, 255)
+        else
+            layer:addFill(MINZ, 137, 159, 199, 255)
+            layer:addFill(14.5, 137, 159, 199, 255)
+            layer:addFill(14.5, 255, 255, 255, 255)
+            layer:addTexture(MINZ, nil)
+            layer:addTexture(14.5, nil)
+            layer:addTexture(14.5, "media/textures/worldMap/Water.png")
+            layer:addTexture(MAXZ, "media/textures/worldMap/Water.png")
+        end
+    
+        layer = styleAPI:newPolygonLayer("road-trail")
+        layer:setMinZoom(12.0)
+        layer:setFilter("highway", "trail")
+        layer:addFill(12.25,155, 155, 155, 0)
+        layer:addFill(13,155, 155, 155, 255)
+        layer:addFill(MAXZ,155, 155, 155, 255)
+    
+        layer = styleAPI:newPolygonLayer("road-tertiary")
+        layer:setMinZoom(11.0)
+        layer:setFilter("highway", "tertiary")
+        layer:addFill(11.5, 165, 165, 165, 0)
+        layer:addFill(13, 165, 165, 165, 255)
+        layer:addFill(MAXZ, 165, 165, 165, 255)
+    
+        layer = styleAPI:newPolygonLayer("road-secondary")
+        layer:setMinZoom(11.0)
+        layer:setFilter("highway", "secondary")
+        layer:addFill(MINZ, 143, 142, 140, 255)
+        layer:addFill(MAXZ, 143, 142, 140, 255)
+    
+        layer = styleAPI:newPolygonLayer("road-primary")
+        layer:setMinZoom(11.0)
+        layer:setFilter("highway", "primary")
+        layer:addFill(MINZ, 120, 120, 120, 255)
+        layer:addFill(MAXZ, 120, 120, 120, 255)
+    
+        layer = styleAPI:newPolygonLayer("railway")
+        layer:setMinZoom(14.0)
+        layer:setFilter("railway", "*")
+        layer:addFill(MINZ, 190, 190, 190, 255)
+        layer:addFill(MAXZ, 190, 190, 190, 255)
+    
+        -- Default, same as building-Residential
+        layer = styleAPI:newPolygonLayer("building")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "yes")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_Residential.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 210, 124, 105, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 210, 124, 105, 225)
+        layer:addFill(MAXZ, 210, 124, 105, 225)
+
+        layer = styleAPI:newPolygonLayer("building-Residential")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "Residential")
+        layer:addFill(MINZ_BUILDINGS, 210, 124, 105, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 210, 124, 105, 225)
+        layer:addFill(MAXZ, 210, 124, 105, 225)
+
+        layer = styleAPI:newPolygonLayer("building-CommunityServices")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "CommunityServices")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_Community.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 139, 117, 235, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 139, 117, 235, 225)
+        layer:addFill(MAXZ, 139, 117, 235, 225)
+
+        layer = styleAPI:newPolygonLayer("building-Hospitality")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "Hospitality")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_Hospitality.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 127, 206, 225, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 127, 206, 225, 225)
+        layer:addFill(MAXZ, 127, 206, 225, 225)
+
+        layer = styleAPI:newPolygonLayer("building-Industrial")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "Industrial")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_Industrial.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 56, 54, 53, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 56, 54, 53, 225)
+        layer:addFill(MAXZ, 56, 54, 53, 225)
+
+        layer = styleAPI:newPolygonLayer("building-Medical")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "Medical")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_Medical.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 229, 128, 151, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 229, 128, 151, 225)
+        layer:addFill(MAXZ, 229, 128, 151, 225)
+
+        layer = styleAPI:newPolygonLayer("building-RestaurantsAndEntertainment")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "RestaurantsAndEntertainment")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_RestaurantsEntertainment.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 245, 225, 60, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 245, 225, 60, 225)
+        layer:addFill(MAXZ, 245, 225, 60, 225)
+
+        layer = styleAPI:newPolygonLayer("building-RetailAndCommercial")
+        layer:setMinZoom(MINZ_BUILDINGS)
+        layer:setFilter("building", "RetailAndCommercial")
+        if ColorblindPatterns then
+            layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_RetailCommercial.png", "ScreenPixel")
+            layer:addScale(MINZ, 4)
+        end
+        layer:addFill(MINZ_BUILDINGS, 184, 205, 84, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 184, 205, 84, 225)
+        layer:addFill(MAXZ, 184, 205, 84, 225)
+    end
 
     -- custom map data for sketches
     LootMaps.Init.CustomMap = function(mapUI)
@@ -804,7 +948,7 @@ function NIM_InitCustomMap()
         elseif mapColor == "green" then
             MapUtils.initCustomStyleGreen(mapUI)
         else
-            MapUtils.initDefaultStyleV1(mapUI)
+            MapUtils.initCustomStyleColored(mapUI)
         end
     
         replaceWaterStyle(mapUI)
@@ -839,6 +983,6 @@ function NIM_InitCustomMap()
     MapUtils.revealKnownArea = function(mapUI) end
 end
 
-Events.OnGameStart.Add(NIM_overrideWorldMapBackground)
+--Events.OnGameStart.Add(NIM_overrideWorldMapBackgroundInit)
 Events.OnKeyPressed.Add(NIM_overrideWorldMapBackgroundKeyPress)
 Events.OnGameStart.Add(NIM_InitCustomMap)

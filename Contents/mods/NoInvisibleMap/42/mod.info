@@ -1,8 +1,8 @@
-name=Handmade maps: An Map Overhaul
+name=Handmade maps: A Map Overhaul
 id=NO_INVISIBLE_MAP
 description=World map system overhaul
 pzversion=42
 icon=icon.png
 author=Pó Royal
-modversion=2.2
+modversion=2.2.1
 poster=poster.png

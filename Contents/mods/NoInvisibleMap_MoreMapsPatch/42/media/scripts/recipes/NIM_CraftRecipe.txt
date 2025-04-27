@@ -64,7 +64,7 @@ module Base
         inputs
         {
             item 1 [Base.HandmadeMap] mode:keep,
-            item 1 [Base.AreaSketch;Base.MarchRidgeMap;Base.MuldraughMap;Base.RiversideMap;Base.RosewoodMap;Base.WestpointMap;Base.LouisvilleMap1;Base.LouisvilleMap2;Base.LouisvilleMap3;Base.LouisvilleMap4;Base.LouisvilleMap5;Base.LouisvilleMap6;Base.LouisvilleMap7;Base.LouisvilleMap8;Base.LouisvilleMap9] mode:keep,
+            item 1 [Base.AreaSketch;Base.MarchRidgeMap;Base.MuldraughMap;Base.RiversideMap;Base.RosewoodMap;Base.WestpointMap;Base.LouisvilleMap1;Base.LouisvilleMap2;Base.LouisvilleMap3;Base.LouisvilleMap4;Base.LouisvilleMap5;Base.LouisvilleMap6;Base.LouisvilleMap7;Base.LouisvilleMap8;Base.LouisvilleMap9;Base.EchoCreekMap;Base.IrvingtonMap;Base.BrandenburgMap;Base.EkronMap;Base.FallasLakeMap;Base.DixieMap;Base.ScenicGroveMap;Base.MuldraughRailyardMap;Base.DoeValleyMap] mode:keep,
             item 1 tags[Pen;Pencil] mode:keep,
             item 1 tags[BluePen] mode:keep,
             item 1 tags[RedPen] mode:keep,
@@ -82,7 +82,7 @@ module Base
         inputs
         {
             item 1 [Base.HandmadeMap] mode:keep,
-            item 1 [Base.AreaSketch;Base.MarchRidgeMap;Base.MuldraughMap;Base.RiversideMap;Base.RosewoodMap;Base.WestpointMap;Base.LouisvilleMap1;Base.LouisvilleMap2;Base.LouisvilleMap3;Base.LouisvilleMap4;Base.LouisvilleMap5;Base.LouisvilleMap6;Base.LouisvilleMap7;Base.LouisvilleMap8;Base.LouisvilleMap9] mode:keep,
+            item 1 [Base.AreaSketch;Base.MarchRidgeMap;Base.MuldraughMap;Base.RiversideMap;Base.RosewoodMap;Base.WestpointMap;Base.LouisvilleMap1;Base.LouisvilleMap2;Base.LouisvilleMap3;Base.LouisvilleMap4;Base.LouisvilleMap5;Base.LouisvilleMap6;Base.LouisvilleMap7;Base.LouisvilleMap8;Base.LouisvilleMap9;Base.EchoCreekMap;Base.IrvingtonMap;Base.BrandenburgMap;Base.EkronMap;Base.FallasLakeMap;Base.DixieMap;Base.ScenicGroveMap;Base.MuldraughRailyardMap;Base.DoeValleyMap] mode:keep,
             item 1 [Base.Crayons;Base.PenMultiColor] mode:keep,
         }
     }

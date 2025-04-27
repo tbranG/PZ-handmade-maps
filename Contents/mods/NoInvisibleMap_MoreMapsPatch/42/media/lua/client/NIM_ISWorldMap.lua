@@ -1,4 +1,4 @@
-require "ISUI/ISPanelJoypad"
+require "ISUI/Maps/ISWorldMapSymbols"
 
 -- initializes world map custom data (known regions, symbols, annotations and points of interest)
 function NIM_AddMapData()
@@ -157,6 +157,13 @@ function NIM_UpdateMapData()
 end
 
 function NIM_ISWorldMapOverrides()
+    -- vanilla needed values
+    local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
+    local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
+    local FONT_HGT_HANDWRITTEN = getTextManager():getFontHeight(UIFont.Handwritten)
+    local UI_BORDER_SPACING = 10
+    local BUTTON_HGT = FONT_HGT_SMALL + 6
+
     -- function override
     -- disables the perspective button
     function ISWorldMap:createChildren()
@@ -236,6 +243,42 @@ function NIM_ISWorldMapOverrides()
         self.buttonPanel.joypadIndexY = 1
     end
     
+    -- function override
+    -- new centralize function
+    function ISWorldMap:onCenterOnPlayer()
+        if not self.character then
+            self.mapAPI:resetView()
+            return
+        end
+    
+        local playerInventory = getPlayer():getInventory()
+        local map = playerInventory:FindAll("HandmadeMap")
+    
+        if map == nil then return end
+    
+        map = map:get(0)
+        local mapData = map:getModData()
+    
+        if mapData.mapRegions == nil then return end
+        
+        local accordionId = mapData.accordionId or 1
+        local nextMap = mapData.mapRegions[accordionId]
+        local dataLen = #mapData.mapRegions
+        
+        accordionId = accordionId + 1
+
+        if accordionId > dataLen then
+            mapData.accordionId = 1
+        else
+            mapData.accordionId = accordionId
+        end
+
+        local focusX = math.floor((nextMap.minX + nextMap.maxX) / 2)
+        local focusY = math.floor((nextMap.minY + nextMap.maxY) / 2)
+    
+        self.mapAPI:centerOn(focusX, focusY)
+    end
+
     -- function override
     -- disables player view and isometric perspective
     function ISWorldMap:new(x, y, width, height)
