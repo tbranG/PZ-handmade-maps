@@ -755,6 +755,7 @@ function NIM_InitCustomMap()
         layer:addFill(MAXZ, 100, 191, 94, 255)
     end
 
+    
     function MapUtils.initCustomStyleColored(mapUI)
         local mapAPI = mapUI.javaObject:getAPIv1()
         local styleAPI = mapAPI:getStyleAPI()
@@ -843,16 +844,16 @@ function NIM_InitCustomMap()
             layer:addTexture(MINZ, "media/textures/worldMap/Colorblind Patterns/Pattern_Residential.png", "ScreenPixel")
             layer:addScale(MINZ, 4)
         end
-        layer:addFill(MINZ_BUILDINGS, 210, 124, 105, 0)
-        layer:addFill(MINZ_BUILDINGS + 0.5, 210, 124, 105, 225)
-        layer:addFill(MAXZ, 210, 124, 105, 225)
+        layer:addFill(MINZ_BUILDINGS, 210, 158, 105, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 210, 158, 105, 255)
+        layer:addFill(MAXZ, 210, 158, 105, 255)
 
         layer = styleAPI:newPolygonLayer("building-Residential")
         layer:setMinZoom(MINZ_BUILDINGS)
         layer:setFilter("building", "Residential")
-        layer:addFill(MINZ_BUILDINGS, 210, 124, 105, 0)
-        layer:addFill(MINZ_BUILDINGS + 0.5, 210, 124, 105, 225)
-        layer:addFill(MAXZ, 210, 124, 105, 225)
+        layer:addFill(MINZ_BUILDINGS, 210, 158, 105, 0)
+        layer:addFill(MINZ_BUILDINGS + 0.5, 210, 158, 105, 255)
+        layer:addFill(MAXZ, 210, 158, 105, 255)
 
         layer = styleAPI:newPolygonLayer("building-CommunityServices")
         layer:setMinZoom(MINZ_BUILDINGS)

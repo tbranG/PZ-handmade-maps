@@ -54,6 +54,24 @@ module Base
         }
     }
 
+    craftRecipe CreateHandmadeMap2
+    {
+        timedAction = Making,
+        Time = 100,
+        Tags = InHandCraft,
+        category = Survival,
+        OnCreate = NIM_generateWorldMapId,
+        inputs 
+        {
+            item 4 [Base.SheetPaper2],
+            item 1 [Base.Stapler] mode:keep,
+        }
+        outputs
+        {
+            item 1 Base.HandmadeMap,
+        }
+    }
+
     craftRecipe AddMapRegion
     {
         timedAction = Making,

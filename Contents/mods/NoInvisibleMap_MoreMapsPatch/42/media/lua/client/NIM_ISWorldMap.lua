@@ -359,11 +359,9 @@ function NIM_ISWorldMapOverrides()
         local player = getPlayer()
         local playerModData = player:getModData()
         local playerInv = player:getInventory()
-    
         local mapModData = nil
     
         if not ISWorldMap.IsAllowed() or not playerInv:contains("HandmadeMap") then
-            player:Say("No World map found")
             return
         end
     
@@ -484,6 +482,65 @@ function NIM_ISWorldMapOverrides()
         end
         if self.character then
             self.character:playSoundLocal("MapClose")
+        end
+    end
+
+    -- function override
+    -- checks if player is allowed to open the map
+    function ISWorldMap.ToggleWorldMap(playerNum)
+        if not ISWorldMap.IsAllowed() then
+            return
+        end
+
+        local playerObj = getSpecificPlayer(playerNum)
+        local playerInv = playerObj:getInventory()
+
+        if not playerInv:contains("HandmadeMap") then
+            HaloTextHelper.addBadText(playerObj, "No world map found");
+            return
+        end
+
+        -- an additional close map check is before the light level check so players can close maps when it's dark
+        -- the map should just automatically close when it's sufficiently dark, but that would be reported as a bug and also be hated
+        if ISWorldMap_instance and ISWorldMap_instance:isVisible() then
+            ISWorldMap.HideWorldMap(playerNum)
+            return
+        end
+        local tooDarkToRead = false
+        if playerObj then
+            tooDarkToRead = playerObj:tooDarkToRead()
+            if playerObj:getVehicle() then
+                if playerObj:getVehicle():hasLiveBattery() then tooDarkToRead = false end
+                if playerObj:getTorchStrength() > 0 then tooDarkToRead = false end
+            end
+        end
+        if getCore():getDebug() then tooDarkToRead = false end
+
+        -- check for light if the map needing light sandbox setting is enabled
+        if ISWorldMap and ISWorldMap.NeedsLight() and playerObj and tooDarkToRead and not isAdmin() then
+            -- kludge to allow for vehicle interior lights
+            if not (playerObj:getVehicle() and playerObj:getVehicle():getBatteryCharge() > 0) then
+                HaloTextHelper.addBadText(playerObj, getText("ContextMenu_TooDark"));
+                return
+            end
+        end
+
+        -- Forbid showing the map when a splitscreen player has died.
+        if ISPostDeathUI and ISPostDeathUI.instance and #ISPostDeathUI.instance > 0 then
+            return
+        end
+
+        if ISWorldMap_instance and ISWorldMap_instance:isVisible() then
+            ISWorldMap.HideWorldMap(playerNum)
+        else
+            -- local playerObj = getSpecificPlayer(playerNum)
+            if playerObj then
+                ISTimedActionQueue.clear(playerObj)
+                ISTimedActionQueue.add(ISReadWorldMap:new(playerObj))
+            else
+                -- Debug: In the main menu
+                ISWorldMap.ShowWorldMap(playerNum)
+            end
         end
     end
 end
