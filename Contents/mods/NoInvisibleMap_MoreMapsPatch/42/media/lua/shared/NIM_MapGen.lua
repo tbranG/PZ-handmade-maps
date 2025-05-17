@@ -11,6 +11,7 @@ function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zInde
             local maxY = playerCell:getMaxY() + 60
             
             if not outside and not playerCanSeeOutside then
+                output:setName("Empty Sketch")
                 minX = 0
                 minY = 0
                 maxX = 0
