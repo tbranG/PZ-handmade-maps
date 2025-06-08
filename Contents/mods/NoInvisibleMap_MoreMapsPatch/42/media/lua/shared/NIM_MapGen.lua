@@ -19,10 +19,10 @@ function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zInde
             end
 
             if zIndex > 0 then
-                minX = math.ceil(minX - ((zIndex ^ 1.3) * 72))
-                minY = math.ceil(minY - ((zIndex ^ 1.3) * 56))
-                maxX = math.ceil(maxX + ((zIndex ^ 1.3) * 72))
-                maxY = math.ceil(maxY + ((zIndex ^ 1.3) * 56))
+                minX = math.ceil(minX - ((zIndex ^ 1.5) * 72))
+                minY = math.ceil(minY - ((zIndex ^ 1.5) * 56))
+                maxX = math.ceil(maxX + ((zIndex ^ 1.5) * 72))
+                maxY = math.ceil(maxY + ((zIndex ^ 1.5) * 56))
             end
 
             local boxTable = {
@@ -194,6 +194,8 @@ function NIM_AddRegion(recipeData, character)
             maxY = _maxY
         })
     end
+
+    mapData.haveNewRegions = true
 end
 
 

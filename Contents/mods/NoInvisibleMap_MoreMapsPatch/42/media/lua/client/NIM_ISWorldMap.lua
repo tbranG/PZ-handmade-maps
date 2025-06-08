@@ -7,22 +7,23 @@ function NIM_AddMapData()
 	local playerModData = getPlayer():getModData()
 	local playerInventory = getPlayer():getInventory()
 
-	WorldMapVisited.getInstance():forget()
-
 	local map = playerInventory:FindAll("HandmadeMap")
-
+    
 	if map ~= nil then
 		map = map:get(0)
 		local mapData = map:getModData()
 		
-		if mapData.mapRegions ~= nil then
-			for _, v in pairs(mapData.mapRegions) do
-				WorldMapVisited.getInstance():setVisitedInSquares(v.minX, v.minY, v.maxX, v.maxY)
-			end
-		end
-
-		if mapData.haveNewSymbols or mapData.id ~= (playerModData.lastReadMap or "") then 
+		if mapData.haveNewSymbols or mapData.haveNewRegions or mapData.id ~= (playerModData.lastReadMap or "") then 
+            WorldMapVisited.getInstance():forget()
 			symbolsApi:clear()
+            
+            if mapData.mapRegions ~= nil then
+                for _, v in pairs(mapData.mapRegions) do
+                    WorldMapVisited.getInstance():setVisitedInSquares(v.minX, v.minY, v.maxX, v.maxY)
+                end
+            end
+
+            mapData.haveNewRegions = false
 
 			if mapData.symbols ~= nil then
 				for _, v in pairs(mapData.symbols) do
@@ -69,7 +70,7 @@ function NIM_AddMapData()
 	end
 end
 
--- Updates world map custom data (known regions, symbols, annotations and points of interest)
+-- Updates world map custom data (symbols, annotations and points of interest)
 function NIM_UpdateMapData()
 	local symbolsAPI = ISWorldMap_instance.mapAPI:getSymbolsAPI()
 	local playerModData = getPlayer():getModData()
@@ -79,15 +80,7 @@ function NIM_UpdateMapData()
 	local thisMap = nil
 
 	if maps ~= nil then
-		-- for _, v in pairs(maps) do
-		-- 	if v.id == playerModData.lastReadMap then
-		-- 		thisMap = v
-		-- 		break
-		-- 	end
-		-- end
-
 		thisMap = maps:get(0)
-		--if thisMap == nil then return end
 
 		local mapData = thisMap:getModData()
 		mapData.symbols = {}

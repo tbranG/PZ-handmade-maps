@@ -3,6 +3,7 @@ require "TimedActions/ISBaseTimedAction"
 
 NIM_ISMapTrackingContext = {}
 
+-- Add new context menu options here:
 NIM_ISMapTrackingContext.inventoryMenu = function(playerid, context, items)
     local player = getSpecificPlayer(playerid)
     for _, v in ipairs(items) do
@@ -12,19 +13,50 @@ NIM_ISMapTrackingContext.inventoryMenu = function(playerid, context, items)
 		end
 
 		NIM_ISMapTrackingContext:TrackPlayerPosition(item, nil, player, context)
+        NIM_ISMapTrackingContext:AddRegionsFromMemory(item, nil, player, context)
     end
 end
 
 function NIM_ISMapTrackingContext:TrackPlayerPosition(item, index, player, context)
     if item and item:getFullType() == "Base.HandmadeMap" then
-        local listEntry = context:addOption("Where am I?", item, NIM_GuessPosition);
+        local listEntry = context:addOption("Locate yourself", item, NIM_GuessPosition);
         local tooltip = ISInventoryPaneContextMenu.addToolTip();
         tooltip.description = "Guess your position on the world map. (You need to be in a known region)"
-        tooltip:setName("Where am I?")
+        tooltip:setName("Locate yourself")
         listEntry.toolTip = tooltip;
     end
 end
 
+function NIM_ISMapTrackingContext:AddRegionsFromMemory(item, index, player, context)
+    if item and item:getFullType() == "Base.HandmadeMap" then
+        local haveNeededItems = false
+
+        local multicolorItem = player:HasItem("Crayons") or player:HasItem("PenMultiColor")
+        
+        if multicolorItem then 
+            haveNeededItems = true 
+        else
+            local blackPen = player:HasItem("Pen") or player:HasItem("Pencil") or player:HasItem("PenFancy") or player:HasItem("PenSpiffo")
+            local redPen = player:HasItem("RedPen")
+            local bluePen = player:HasItem("BluePen")
+            local greenPen = player:HasItem("GreenPen")
+
+            if blackPen and redPen and bluePen and greenPen then
+                haveNeededItems = true
+            end
+        end
+
+        if haveNeededItems then
+            local listEntry = context:addOption("Add Region", item, function() NIM_TransferRegions(item) end);
+            local tooltip = ISInventoryPaneContextMenu.addToolTip();
+            tooltip.description = "Add regions to the World map from memory. (Regions that you have visited)"
+            tooltip:setName("Add Region")
+            listEntry.toolTip = tooltip;
+        end
+    end
+end
+
+-- Method responsible for pinpointing player position on the world map
 function NIM_GuessPosition()
     local player = getPlayer()
     local playerX = player:getX()
@@ -142,6 +174,44 @@ function NIM_GuessPosition()
             markPositionOnMap(player, playerX, playerY, map:getModData(), true)
         end
     end
+end
+
+-- Method responsible for adding visited regions to the world map
+function NIM_TransferRegions(item)
+    local mapModData = item:getModData()
+    local playerModData = getPlayer():getModData()
+
+    for _, v in pairs(playerModData.visitedRegions) do
+        if mapModData.mapRegions == nil then
+            mapModData.mapRegions = {}
+        end
+
+        local isRegionAlreadyOnMap = false
+        local offset = 32
+
+        for _, k in pairs(mapModData.mapRegions) do
+            if v.minX >= k.minX - offset then
+                if v.maxX <= k.maxX + offset then
+                    if v.minY >= k.minY - offset then
+                        if v.maxY <= k.maxY + offset then
+                            isRegionAlreadyOnMap = true
+                        end
+                    end
+                end
+            end
+        end
+        
+        if not isRegionAlreadyOnMap then
+            table.insert(mapModData.mapRegions, v)
+            mapModData.haveNewRegions = true
+        end
+    end
+
+    local playerObj = getPlayer()
+    playerModData.visitedRegions = {}
+
+    ISTimedActionQueue.clear(playerObj)
+    ISTimedActionQueue.add(ISReadWorldMap:new(playerObj))
 end
 
 Events.OnPreFillInventoryObjectContextMenu.Add(NIM_ISMapTrackingContext.inventoryMenu)
