@@ -77,7 +77,7 @@ function NIM_UpdateMapData()
 
 	local map = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
 
-	if maps ~= nil then
+	if map ~= nil then
 		local mapData = map:getModData()
 		mapData.symbols = {}
 		mapData.notes = {}
