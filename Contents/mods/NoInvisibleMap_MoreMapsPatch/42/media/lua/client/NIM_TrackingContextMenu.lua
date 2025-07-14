@@ -30,18 +30,37 @@ end
 function NIM_ISMapTrackingContext:AddRegionsFromMemory(item, index, player, context)
     if item and item:getFullType() == "Base.HandmadeMap" then
         local haveNeededItems = false
+        local playerInv = player:getInventory()
 
-        local multicolorItem = player:HasItem("Crayons") or player:HasItem("PenMultiColor")
+        local hasMulticolorItem = function()
+            return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Crayons" end) ~= nil or 
+                playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenMultiColor" end) ~= nil
+        end
         
-        if multicolorItem then 
+        if hasMulticolorItem() then 
             haveNeededItems = true 
         else
-            local blackPen = player:HasItem("Pen") or player:HasItem("Pencil") or player:HasItem("PenFancy") or player:HasItem("PenSpiffo")
-            local redPen = player:HasItem("RedPen")
-            local bluePen = player:HasItem("BluePen")
-            local greenPen = player:HasItem("GreenPen")
+            local hasBlack = function()
+                return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Pen" end) ~= nil or 
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Pencil" end) ~= nil or
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenFancy" end) ~= nil or
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenSpiffo" end) ~= nil or
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerBlack" end) ~= nil
+            end
+            local hasRed = function()
+                return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.RedPen" end) ~= nil or 
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerRed" end) ~= nil
+            end
+            local hasBlue = function()
+                return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.BluePen" end) ~= nil or 
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerBlue" end) ~= nil
+            end
+            local hasGreen = function()
+                return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.GreenPen" end) ~= nil or 
+                    playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerGreen" end) ~= nil
+            end
 
-            if blackPen and redPen and bluePen and greenPen then
+            if hasBlack() and hasRed() and hasBlue() and hasGreen() then
                 haveNeededItems = true
             end
         end
@@ -135,7 +154,7 @@ function NIM_GuessPosition()
         ISTimedActionQueue.add(ISReadWorldMap:new(playerObj, x + offsetX, y + offsetY, zoomSize))
     end
 
-    local map = player:getInventory():FindAll("HandmadeMap")
+    local map = player:getInventory():getAllTypeRecurse("HandmadeMap")
 
 	if map ~= nil then
 		map = map:get(0)

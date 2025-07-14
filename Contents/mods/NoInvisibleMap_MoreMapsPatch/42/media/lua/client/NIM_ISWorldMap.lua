@@ -7,10 +7,9 @@ function NIM_AddMapData()
 	local playerModData = getPlayer():getModData()
 	local playerInventory = getPlayer():getInventory()
 
-	local map = playerInventory:FindAll("HandmadeMap")
+	local map = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
     
 	if map ~= nil then
-		map = map:get(0)
 		local mapData = map:getModData()
 		
 		if mapData.haveNewSymbols or mapData.haveNewRegions or mapData.id ~= (playerModData.lastReadMap or "") then 
@@ -76,13 +75,10 @@ function NIM_UpdateMapData()
 	local playerModData = getPlayer():getModData()
 	local playerInventory = getPlayer():getInventory()
 
-	local maps = playerInventory:FindAll("HandmadeMap")
-	local thisMap = nil
+	local map = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
 
 	if maps ~= nil then
-		thisMap = maps:get(0)
-
-		local mapData = thisMap:getModData()
+		local mapData = map:getModData()
 		mapData.symbols = {}
 		mapData.notes = {}
 
@@ -245,11 +241,10 @@ function NIM_ISWorldMapOverrides()
         end
     
         local playerInventory = getPlayer():getInventory()
-        local map = playerInventory:FindAll("HandmadeMap")
+        local map = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
     
         if map == nil then return end
     
-        map = map:get(0)
         local mapData = map:getModData()
     
         if mapData.mapRegions == nil then return end
@@ -269,7 +264,7 @@ function NIM_ISWorldMapOverrides()
         local focusX = math.floor((nextMap.minX + nextMap.maxX) / 2)
         local focusY = math.floor((nextMap.minY + nextMap.maxY) / 2)
     
-        self.mapAPI:centerOn(focusX, focusY)
+        self.mapAPI:transitionTo(focusX, focusY, self.mapAPI:getZoomF())
     end
 
     -- function override
@@ -354,19 +349,15 @@ function NIM_ISWorldMapOverrides()
         local playerInv = player:getInventory()
         local mapModData = nil
     
-        if not ISWorldMap.IsAllowed() or not playerInv:contains("HandmadeMap") then
+        local map = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
+        
+        if not ISWorldMap.IsAllowed() or map == nil then
             return
         end
     
         playerModData.isWorldMapOpen = true
-    
-        local map = playerInv:FindAll("HandmadeMap")
-    
-        if map ~= nil then
-            map = map:get(0)
-            mapModData = map:getModData()
-        end
-    
+        mapModData = map:getModData()
+
         if not ISWorldMap_instance then
             local INSET = 0
             ISWorldMap_instance = ISWorldMap:new(INSET, INSET, getCore():getScreenWidth() - INSET * 2, getCore():getScreenHeight() - INSET * 2)
@@ -441,7 +432,7 @@ function NIM_ISWorldMapOverrides()
         end
     end
 
-    -- fucntion override
+    -- function override
     -- adding NIM_UpdateMapData call
     function ISWorldMap:close()
         NIM_UpdateMapData()
@@ -487,8 +478,10 @@ function NIM_ISWorldMapOverrides()
 
         local playerObj = getSpecificPlayer(playerNum)
         local playerInv = playerObj:getInventory()
+        
+        local map = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
 
-        if not playerInv:contains("HandmadeMap") then
+        if map == nil then
             HaloTextHelper.addBadText(playerObj, "No world map found");
             return
         end

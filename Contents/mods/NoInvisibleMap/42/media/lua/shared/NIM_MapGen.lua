@@ -51,11 +51,11 @@ function NIM_GenerateMapSingleColor(recipeData, character)
 
     local pencilColor = recipeData:getAllKeepInputItems():get(0):getType()
 
-    if pencilColor == "Pen" or pencilColor == "Pencil" then
+    if pencilColor == "Pen" or pencilColor == "Pencil" or pencilColor == "PenFancy" or pencilColor == "PenSpiffo" or pencilColor == "MarkerBlack" then
         pencilColor = "black"
-    elseif pencilColor == "RedPen" then
+    elseif pencilColor == "RedPen" or pencilColor == "MarkerRed" then
         pencilColor = "red"
-    elseif pencilColor == "BluePen" then
+    elseif pencilColor == "BluePen" or pencilColor == "MarkerBlue" then
         pencilColor = "blue"
     else
         pencilColor = "green"

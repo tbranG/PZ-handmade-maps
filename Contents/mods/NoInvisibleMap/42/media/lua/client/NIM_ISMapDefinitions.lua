@@ -73,20 +73,29 @@ function NIM_InitCustomMap()
 		layer:addFill(MINZ, 59, 141, 149, 255)
 		layer:addFill(MAXZ, 59, 141, 149, 255)
 	end
-
-	local function overlayPNG(mapUI, x, y, scale, layerName, tex, alpha)
-		local texture = getTexture(tex)
-		if not texture then return end
-		local mapAPI = mapUI.javaObject:getAPIv1()
-		local styleAPI = mapAPI:getStyleAPI()
-		local layer = styleAPI:newTextureLayer(layerName)
-		layer:setMinZoom(MINZ)
-		layer:addFill(MINZ, 255, 255, 255, (alpha or 1.0) * 255)
-		layer:addTexture(MINZ, tex)
-		layer:setBoundsInSquares(x, y, x + texture:getWidth() * scale, y + texture:getHeight() * scale)
-	end
-	
     
+    local function forestPyramidStyle(mapUI)
+        local mapAPI = mapUI.javaObject:getAPIv3()
+        local styleAPI = mapAPI:getStyleAPI()
+
+        local ignoreForestFeatures = false
+        if ignoreForestFeatures then
+            styleAPI:removeLayerById("forest")
+        end
+
+        local pyramidLayer = mapAPI:getStyleAPI():newPyramidLayer("pyramid-forest")
+        pyramidLayer:setPyramidFileName("forest.pyramid.zip")
+        pyramidLayer:addFill(0.0, 189, 197, 163, 255.0)
+        if not ignoreForestFeatures then
+            pyramidLayer:addFill(14.999, 189, 197, 163, 255.0)
+            pyramidLayer:addFill(15.0, 0.0, 0.0, 0.0, 0.0)
+        end
+
+        local index1 = styleAPI:indexOfLayer("pyramid-forest")
+        local index2 = styleAPI:indexOfLayer("forest")
+        styleAPI:moveLayer(index1, index2 + 1)
+    end
+
     -- custom styles 
     function MapUtils.initCustomStyleBlack(mapUI)
         local mapAPI = mapUI.javaObject:getAPIv1()
@@ -252,6 +261,9 @@ function NIM_InitCustomMap()
         layer:addFill(MINZ_BUILDINGS, 130, 130, 130, 0)
         layer:addFill(MINZ_BUILDINGS + 0.5, 130, 130, 130, 255)
         layer:addFill(MAXZ, 130, 130, 130, 255)
+
+        MapUtils.overlayPaper(mapUI)
+        forestPyramidStyle(mapUI)    
     end
     
     
@@ -419,6 +431,9 @@ function NIM_InitCustomMap()
         layer:addFill(MINZ_BUILDINGS, 227, 98, 98, 0)
         layer:addFill(MINZ_BUILDINGS + 0.5, 227, 98, 98, 255)
         layer:addFill(MAXZ, 227, 98, 98, 255)
+        
+        MapUtils.overlayPaper(mapUI)
+        forestPyramidStyle(mapUI)    
     end
     
     
@@ -586,6 +601,9 @@ function NIM_InitCustomMap()
         layer:addFill(MINZ_BUILDINGS,92, 135, 219, 0)
         layer:addFill(MINZ_BUILDINGS + 0.5,92, 135, 219, 255)
         layer:addFill(MAXZ,92, 135, 219, 255)
+        
+        MapUtils.overlayPaper(mapUI)
+        forestPyramidStyle(mapUI)    
     end
     
     
@@ -753,6 +771,9 @@ function NIM_InitCustomMap()
         layer:addFill(MINZ_BUILDINGS, 100, 191, 94, 0)
         layer:addFill(MINZ_BUILDINGS + 0.5, 100, 191, 94, 255)
         layer:addFill(MAXZ, 100, 191, 94, 255)
+        
+        MapUtils.overlayPaper(mapUI)
+        forestPyramidStyle(mapUI)    
     end
 
     
@@ -920,6 +941,10 @@ function NIM_InitCustomMap()
         layer:addFill(MINZ_BUILDINGS, 184, 205, 84, 0)
         layer:addFill(MINZ_BUILDINGS + 0.5, 184, 205, 84, 225)
         layer:addFill(MAXZ, 184, 205, 84, 225)
+
+        replaceWaterStyle(mapUI)
+        MapUtils.overlayPaper(mapUI)
+        forestPyramidStyle(mapUI)    
     end
 
     -- custom map data for sketches
