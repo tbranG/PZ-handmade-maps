@@ -311,7 +311,8 @@ UI.PrintMedia = UI.Window{
                                 y = newSymbol.y,
                                 r = newSymbol.r,
                                 g = newSymbol.g,
-                                b = newSymbol.b
+                                b = newSymbol.b,
+                                scale = 1.5
                             })
 
                             modData.pointsOfInterest = data
@@ -332,7 +333,8 @@ UI.PrintMedia = UI.Window{
                                     y = newSymbol.y,
                                     r = newSymbol.r,
                                     g = newSymbol.g,
-                                    b = newSymbol.b
+                                    b = newSymbol.b,
+                                    scale = 1.5
                                 })
                             end
                         end

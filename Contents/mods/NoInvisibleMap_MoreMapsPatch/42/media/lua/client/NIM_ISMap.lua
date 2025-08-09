@@ -6,6 +6,19 @@ local FONT_HGT_HANDWRITTEN = getTextManager():getFontHeight(UIFont.Handwritten)
 local BUTTON_HGT = FONT_HGT_SMALL + 6
 local UI_BORDER_SPACING = 10
 
+function NIM_MarkLocation()
+    local mapAPI = self.mapAPI
+    local x1 = mapAPI:getMinXInSquares()
+    local y1 = mapAPI:getMinYInSquares()
+    local x2 = mapAPI:getMaxXInSquares()
+    local y2 = mapAPI:getMaxYInSquares()
+    local centerX = (x1 + x2) / 2
+    local centerY = (y1 + y2) / 2
+    local playerObj = self.character
+    ISTimedActionQueue.clear(playerObj)
+    ISTimedActionQueue.add(ISReadWorldMap:new(playerObj, centerX, centerY, self.mapAPI:getZoomF()))
+end
+
 function NIM_ISMapOverrides()
     -- function override
     -- we need to disable key button, so the panel is no longer acessible
@@ -60,10 +73,26 @@ function NIM_ISMapOverrides()
         self.placeSymbBtn.borderColor = {r=1, g=1, b=1, a=0.4};
         self.placeSymbBtn:setVisible(false)
         self:addChild(self.placeSymbBtn);
+
+        if self.mapObj:getStashMap() then
+            local texture = getTexture("media/textures/Item_Map.png");
+            btnWidth = UI_BORDER_SPACING*2+texture:getWidth();
+            btnHeight = UI_BORDER_SPACING*2+texture:getHeight();
+            self.revealBtn = ISButton:new(self.width - UI_BORDER_SPACING+1 - btnWidth, self.height - UI_BORDER_SPACING-1 - btnHeight, btnWidth, btnHeight, "", self, ISMap.onButtonClick);
+            self.revealBtn:setImage(texture)
+            self.revealBtn.internal = "REVEAL";
+            self.revealBtn.anchorLeft = false
+            self.revealBtn.anchorRight = true
+            self.revealBtn:initialise();
+            self.revealBtn:instantiate();
+            self.revealBtn.borderColor = {r=1, g=1, b=1, a=0.4};
+            self:addChild(self.revealBtn);
+        end
     end
     
     -- function override
     -- disabling shortcuts to open the key panel
+    -- new reveal function
     function ISMap:onButtonClick(button)
         local player = self.character:getPlayerNum()
         if button.internal == "OK" then
@@ -111,6 +140,9 @@ function NIM_ISMapOverrides()
         if button.internal == "PLACESYMBOL" then
             -- Joypad only
             self.symbolsUI:onJoypadDownInMap(Joypad.AButton, self.joyfocus)
+        end
+        if button.internal == "REVEAL" then
+            NIM_MarkLocation()
         end
     end
 

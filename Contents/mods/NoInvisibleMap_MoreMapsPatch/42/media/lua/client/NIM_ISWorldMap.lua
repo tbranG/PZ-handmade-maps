@@ -2,7 +2,7 @@ require "ISUI/Maps/ISWorldMapSymbols"
 
 -- initializes world map custom data (known regions, symbols, annotations and points of interest)
 function NIM_AddMapData()
-	local symbolsApi = ISWorldMap_instance.mapAPI:getSymbolsAPI()
+	local symbolsApi = ISWorldMap_instance.mapAPI:getSymbolsAPIv2()
 
 	local playerModData = getPlayer():getModData()
 	local playerInventory = getPlayer():getInventory()
@@ -29,16 +29,19 @@ function NIM_AddMapData()
 					local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
 					textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
 					textureSymbol:setAnchor(0.5, 0.5)
-					textureSymbol:setScale(ISMap.SCALE)
+					textureSymbol:setScale(v.scale)
+                    textureSymbol:setRotation(v.rotation)
 				end
 			end
 		
 			if mapData.notes ~= nil then
 				for _, v in pairs(mapData.notes) do
-					local textSymbol = symbolsApi:addUntranslatedText(v.text, UIFont.SdfCaveat, v.x, v.y)
+                    local layerID = symbolsApi:getDefaultTextLayerID()
+					local textSymbol = symbolsApi:addUntranslatedText(v.text, layerID, v.x, v.y)
 					textSymbol:setRGBA(v.r, v.g, v.b, 1.0)
 					textSymbol:setAnchor(0.0, 0.0)
-					textSymbol:setScale(ISMap.SCALE)
+					textSymbol:setScale(v.scale)
+                    textSymbol:setRotation(v.rotation)
 				end
 			end
 
@@ -47,7 +50,8 @@ function NIM_AddMapData()
 					local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
 					textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
 					textureSymbol:setAnchor(0.5, 0.5)
-					textureSymbol:setScale(ISMap.SCALE)
+					textureSymbol:setScale(v.scale)
+                    textureSymbol:setRotation(v.rotation)
 				end
 
 				playerModData.haveNewPointOfInterest = false
@@ -61,7 +65,7 @@ function NIM_AddMapData()
 				local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
 				textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
 				textureSymbol:setAnchor(0.5, 0.5)
-				textureSymbol:setScale(ISMap.SCALE)
+				textureSymbol:setScale(v.scale)
 			end
 		end
 
@@ -71,7 +75,7 @@ end
 
 -- Updates world map custom data (symbols, annotations and points of interest)
 function NIM_UpdateMapData()
-	local symbolsAPI = ISWorldMap_instance.mapAPI:getSymbolsAPI()
+	local symbolsAPI = ISWorldMap_instance.mapAPI:getSymbolsAPIv2()
 	local playerModData = getPlayer():getModData()
 	local playerInventory = getPlayer():getInventory()
 
@@ -98,7 +102,9 @@ function NIM_UpdateMapData()
 						y = symbol:getWorldY(),
 						r = symbol:getRed(),
 						g = symbol:getGreen(),
-						b = symbol:getBlue()
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
 					})
 
 					mapData.notes = data
@@ -109,7 +115,9 @@ function NIM_UpdateMapData()
 						y = symbol:getWorldY(),
 						r = symbol:getRed(),
 						g = symbol:getGreen(),
-						b = symbol:getBlue()
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
 					})
 				end
 			else
@@ -123,7 +131,9 @@ function NIM_UpdateMapData()
 						y = symbol:getWorldY(),
 						r = symbol:getRed(),
 						g = symbol:getGreen(),
-						b = symbol:getBlue()
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
 					})
 
 					mapData.symbols = data
@@ -134,7 +144,9 @@ function NIM_UpdateMapData()
 						y = symbol:getWorldY(),
 						r = symbol:getRed(),
 						g = symbol:getGreen(),
-						b = symbol:getBlue()
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
 					})
 				end
 			end
@@ -181,10 +193,12 @@ function NIM_ISWorldMapOverrides()
     
         local buttons = {}
     
-        self.optionBtn = ISButton:new(0, 0, btnSize, btnSize, getText("UI_mainscreen_option"), self, self.onChangeOptions)
-        self.buttonPanel:addChild(self.optionBtn)
-        table.insert(buttons, self.optionBtn)
-    
+        if getDebug() or (isClient() and (getAccessLevel() == "admin")) then
+            self.optionBtn = ISButton:new(0, 0, btnSize, btnSize, getText("UI_mainscreen_option"), self, self.onChangeOptions)
+            self.buttonPanel:addChild(self.optionBtn)
+            table.insert(buttons, self.optionBtn)
+        end
+
         self.zoomInButton = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "+", self, self.onZoomInButton)
         self.buttonPanel:addChild(self.zoomInButton)
         table.insert(buttons, self.zoomInButton)
@@ -193,11 +207,11 @@ function NIM_ISWorldMapOverrides()
         self.buttonPanel:addChild(self.zoomOutButton)
         table.insert(buttons, self.zoomOutButton)
     
-        if getDebug() then
-            self.pyramidBtn = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "", self, self.onTogglePyramid)
-            self.pyramidBtn:setImage(self.texViewPyramid)
-            self.buttonPanel:addChild(self.pyramidBtn)
-            table.insert(buttons, self.pyramidBtn)
+        if TERRAIN_IMAGE then
+            self.terrainBtn = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "", self, self.onToggleTerrainImage)
+            self.terrainBtn:setImage(self.texViewTerrainImage)
+            self.buttonPanel:addChild(self.terrainBtn)
+            table.insert(buttons, self.terrainBtn)
         end
     
         --[[
@@ -313,28 +327,41 @@ function NIM_ISWorldMapOverrides()
             self:drawTexture(self.cross, self.width/2-12, self.height/2-12, 1, 1,1,1);
         end
     
-        if self.joyfocus then
+        if self.joyfocus and self.stashMapUI and self.stashMapUI:isVisible() then
+                if self.mouseOverPrintMedia then
+                    self:renderJoypadPrompt(Joypad.Texture.AButton, "PRINT MEDIA", self.buttonPanel.x - 16 - 32, self.buttonPanel.y - 10 - self.joypadPromptHgt)
+                end
+            self:renderJoypadPrompt(Joypad.Texture.BButton, getText("UI_Cancel"), self.buttonPanel.x - 16 - 32, self.buttonPanel.y - 10 - self.joypadPromptHgt - 10 - self.joypadPromptHgt)
+            self:renderJoypadPrompt(Joypad.Texture.LTrigger, getText("IGUI_Map_ZoomOut"), 16, self.height - 16 - self.joypadPromptHgt - 8 - self.joypadPromptHgt)
+            self:renderJoypadPrompt(Joypad.Texture.RTrigger, getText("IGUI_Map_ZoomIn"), 16, self.height - 16 - self.joypadPromptHgt - 8 - self.joypadPromptHgt - 8 - self.joypadPromptHgt)
+        elseif self.joyfocus then
             local joypadTexture = Joypad.Texture.YButton
             self:drawTexture(joypadTexture, self.buttonPanel.x - 16 - joypadTexture:getWidth(), self.buttonPanel.y + (self.buttonPanel.height - joypadTexture:getHeight()) / 2, 1, 1, 1, 1)
-    
+
             self.joypadPromptHgt = math.max(32, FONT_HGT_LARGE)
             self:renderJoypadPrompt(Joypad.Texture.XButton, getText("IGUI_Map_EditMarkings"), 16, self.height - 16 - self.joypadPromptHgt)
-    
+
             if self.symbolsUI.currentTool then
                 self:renderJoypadPrompt(Joypad.Texture.BButton, getText("UI_Cancel"), self.buttonPanel.x - 16 - 32, self.buttonPanel.y - 10 - self.joypadPromptHgt - 10 - self.joypadPromptHgt)
                 local text = self.symbolsUI:getJoypadAButtonText()
                 if text then
                     self:renderJoypadPrompt(Joypad.Texture.AButton, text, self.buttonPanel.x - 16 - 32, self.buttonPanel.y - 10 - self.joypadPromptHgt)
                 end
+            else
+                if self.mouseOverPrintMedia then
+                    self:renderJoypadPrompt(Joypad.Texture.AButton, "PRINT MEDIA", self.buttonPanel.x - 16 - 32, self.buttonPanel.y - 10 - self.joypadPromptHgt)
+                end
+                if self.mouseOverStashMap then
+                    self:renderJoypadPrompt(Joypad.Texture.AButton, "STASH MAP", self.buttonPanel.x - 16 - 32, self.buttonPanel.y - 10 - self.joypadPromptHgt)
+                end
             end
-    
+
             self:renderJoypadPrompt(Joypad.Texture.LTrigger, getText("IGUI_Map_ZoomOut"), 16, self.height - 16 - self.joypadPromptHgt - 8 - self.joypadPromptHgt)
             self:renderJoypadPrompt(Joypad.Texture.RTrigger, getText("IGUI_Map_ZoomIn"), 16, self.height - 16 - self.joypadPromptHgt - 8 - self.joypadPromptHgt - 8 - self.joypadPromptHgt)
         end
-    
+
         -- change to make the chat window visible when the map is open
-        if isClient() then
-            ISChat.chat:setVisible(true);
+        if isClient() and ISChat.chat ~= nil and ISChat.chat:isVisible() then
             ISChat.chat:bringToTop()
         end
     
@@ -400,6 +427,15 @@ function NIM_ISWorldMapOverrides()
                     getSpecificPlayer(i-1):setBlockMovement(true)
                 end
             end
+
+            local mapUI = ISWorldMap_instance
+            local mapAPI = mapUI.javaObject:getAPIv1()
+
+            --new background color
+            local r,g,b = 127/255, 118/255, 108/255
+            mapAPI:setUnvisitedRGBA(r * 0.915, g * 0.915, b * 0.915, 1.0)
+            mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
+            
             return
         end
     
@@ -420,6 +456,14 @@ function NIM_ISWorldMapOverrides()
         ISWorldMap_instance:setVisible(true)
         ISWorldMap_instance:addToUIManager()
         ISWorldMap_instance.getJoypadFocus = true
+
+        local mapUI = ISWorldMap_instance
+        local mapAPI = mapUI.javaObject:getAPIv1()
+
+        --new background color
+        local r,g,b = 127/255, 118/255, 108/255
+        mapAPI:setUnvisitedRGBA(r * 0.915, g * 0.915, b * 0.915, 1.0)
+        mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
     
         if MainScreen.instance.inGame then
             for i=1,getNumActivePlayers() do

@@ -31,22 +31,6 @@ function NIM_InitWorldMap()
 	ISWorldMap_instance:removeFromUIManager()
 end
 
--- updates world map undiscovered area background
-function NIM_overrideWorldMapBackgroundKeyPress(key)
-    if not MainScreen.instance.inGame then return end
-    
-    if ISWorldMap_instance == nil then
-        NIM_InitWorldMap()
-    end
-
-    if not ISWorldMap.checkKey(key) then return end
-
-    local mapUI = ISWorldMap_instance
-    local mapAPI = mapUI.javaObject:getAPIv1()
-
-	mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
-end
-
 -- custom map definition
 function NIM_InitCustomMap()
     MapUtils = MapUtils or {}
@@ -1009,6 +993,4 @@ function NIM_InitCustomMap()
     MapUtils.revealKnownArea = function(mapUI) end
 end
 
---Events.OnGameStart.Add(NIM_overrideWorldMapBackgroundInit)
-Events.OnKeyPressed.Add(NIM_overrideWorldMapBackgroundKeyPress)
 Events.OnGameStart.Add(NIM_InitCustomMap)

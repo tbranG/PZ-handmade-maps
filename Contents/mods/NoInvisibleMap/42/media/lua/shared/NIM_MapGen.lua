@@ -102,7 +102,7 @@ function NIM_AddRegion(recipeData, character)
 
     LootMaps.callLua("Init", mapUI)
     
-    local symbolsAPI = WorldMapSymbolsV1.new(javaObject, sketch:getSymbols())
+    local symbolsAPI = WorldMapSymbolsV2.new(javaObject, sketch:getSymbols())
 
     if sketch:getMapID() == "CustomMap" then
         local sketchData = sketch:getModData().custoMapData
@@ -135,7 +135,9 @@ function NIM_AddRegion(recipeData, character)
                     y = symbol:getWorldY(),
                     r = symbol:getRed(),
                     g = symbol:getGreen(),
-                    b = symbol:getBlue()
+                    b = symbol:getBlue(),
+                    scale = symbol:getScale(),
+                    rotation = symbol:getRotation()
                 })
 
                 mapData.notes = data
@@ -146,7 +148,9 @@ function NIM_AddRegion(recipeData, character)
                     y = symbol:getWorldY(),
                     r = symbol:getRed(),
                     g = symbol:getGreen(),
-                    b = symbol:getBlue()
+                    b = symbol:getBlue(),
+                    scale = symbol:getScale(),
+                    rotation = symbol:getRotation()
                 })
             end
         else
@@ -160,7 +164,9 @@ function NIM_AddRegion(recipeData, character)
                     y = symbol:getWorldY(),
                     r = symbol:getRed(),
                     g = symbol:getGreen(),
-                    b = symbol:getBlue()
+                    b = symbol:getBlue(),
+                    scale = symbol:getScale(),
+                    rotation = symbol:getRotation()
                 })
 
                 mapData.symbols = data
@@ -171,7 +177,9 @@ function NIM_AddRegion(recipeData, character)
                     y = symbol:getWorldY(),
                     r = symbol:getRed(),
                     g = symbol:getGreen(),
-                    b = symbol:getBlue()
+                    b = symbol:getBlue(),
+                    scale = symbol:getScale(),
+                    rotation = symbol:getRotation()
                 })
             end
         end
