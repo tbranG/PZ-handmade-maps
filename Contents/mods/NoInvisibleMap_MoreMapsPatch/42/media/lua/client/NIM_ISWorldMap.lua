@@ -51,7 +51,6 @@ function NIM_AddMapData()
 					textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
 					textureSymbol:setAnchor(0.5, 0.5)
 					textureSymbol:setScale(v.scale)
-                    textureSymbol:setRotation(v.rotation)
 				end
 
 				playerModData.haveNewPointOfInterest = false
@@ -197,11 +196,15 @@ function NIM_ISWorldMapOverrides()
             self.optionBtn = ISButton:new(0, 0, btnSize, btnSize, getText("UI_mainscreen_option"), self, self.onChangeOptions)
             self.buttonPanel:addChild(self.optionBtn)
             table.insert(buttons, self.optionBtn)
-        end
 
-        self.zoomInButton = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "+", self, self.onZoomInButton)
-        self.buttonPanel:addChild(self.zoomInButton)
-        table.insert(buttons, self.zoomInButton)
+            self.zoomInButton = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "+", self, self.onZoomInButton)
+            self.buttonPanel:addChild(self.zoomInButton)
+            table.insert(buttons, self.zoomInButton)
+        else
+            self.zoomInButton = ISButton:new(0, 0, btnSize, btnSize, "+", self, self.onZoomInButton)
+            self.buttonPanel:addChild(self.zoomInButton)
+            table.insert(buttons, self.zoomInButton)
+        end
     
         self.zoomOutButton = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "-", self, self.onZoomOutButton)
         self.buttonPanel:addChild(self.zoomOutButton)

@@ -4,6 +4,6 @@ description=World map system overhaul. If you have More Maps, enable only this v
 pzversion=42
 icon=icon.png
 author=Pó Royal
-modversion=2.6
+modversion=2.6.2
 poster=poster.png
 require=\MoreMapsB42
