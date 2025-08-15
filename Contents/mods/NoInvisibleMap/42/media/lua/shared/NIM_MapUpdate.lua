@@ -1,3 +1,27 @@
+-- Utils ########################################################################
+
+local function NIM_GetDistance(a, b)
+    return math.sqrt((math.abs(a.x - b.x))^2 + (math.abs(a.y - b.y))^2)
+end
+
+local function NIM_GetGreater(a, b)
+    if a > b then
+        return a
+    else
+        return b
+    end
+end
+
+local function NIM_GetLower(a, b)
+    if a > b then
+        return b
+    else
+        return a
+    end
+end
+
+-- ###############################################################################
+
 function NIM_CreateMemoryRegion(playerObj, playerModData)
     local bminX = playerObj:getX() - 48
     local bminY = playerObj:getY() - 48
@@ -44,32 +68,6 @@ function NIM_CreateMemoryRegion(playerObj, playerModData)
 
     table.insert(playerModData.visitedRegions, newBox)
 end
-
-
--- Utils ########################################################################
-
-local function NIM_GetDistance(a, b)
-    return math.sqrt((math.abs(a.x - b.x))^2 + (math.abs(a.y - b.y))^2)
-end
-
-local function NIM_GetGreater(a, b)
-    if a > b then
-        return a
-    else
-        return b
-    end
-end
-
-local function NIM_GetLower(a, b)
-    if a > b then
-        return b
-    else
-        return a
-    end
-end
-
--- ###############################################################################
-
 
 function NIM_OnTickMapUpdate()
     local playerObj = getPlayer()
