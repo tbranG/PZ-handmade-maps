@@ -6,19 +6,6 @@ local FONT_HGT_HANDWRITTEN = getTextManager():getFontHeight(UIFont.Handwritten)
 local BUTTON_HGT = FONT_HGT_SMALL + 6
 local UI_BORDER_SPACING = 10
 
-function NIM_MarkLocation()
-    local mapAPI = self.mapAPI
-    local x1 = mapAPI:getMinXInSquares()
-    local y1 = mapAPI:getMinYInSquares()
-    local x2 = mapAPI:getMaxXInSquares()
-    local y2 = mapAPI:getMaxYInSquares()
-    local centerX = (x1 + x2) / 2
-    local centerY = (y1 + y2) / 2
-    local playerObj = self.character
-    ISTimedActionQueue.clear(playerObj)
-    ISTimedActionQueue.add(ISReadWorldMap:new(playerObj, centerX, centerY, self.mapAPI:getZoomF()))
-end
-
 function NIM_ISMapOverrides()
     -- function override
     -- we need to disable key button, so the panel is no longer acessible
@@ -142,7 +129,7 @@ function NIM_ISMapOverrides()
             self.symbolsUI:onJoypadDownInMap(Joypad.AButton, self.joyfocus)
         end
         if button.internal == "REVEAL" then
-            NIM_MarkLocation()
+            --NIM_MarkLocation()
         end
     end
 

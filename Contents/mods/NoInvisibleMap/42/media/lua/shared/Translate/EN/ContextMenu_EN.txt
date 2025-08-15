@@ -1,0 +1,7 @@
+ContextMenu_EN = {
+	ContextMenu_LocateFunc = "Locate Yourself",
+	ContextMenu_LocateDesc = "Guess your position on the world map. (You need to be in a known region)",
+
+    ContextMenu_AddRegionFunc = "Add Region",
+    COntextMenu_AddRegionDesc = "Add regions to the World map from memory. (Regions that you have visited)",
+}

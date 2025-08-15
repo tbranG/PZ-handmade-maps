@@ -19,10 +19,10 @@ end
 
 function NIM_ISMapTrackingContext:TrackPlayerPosition(item, index, player, context)
     if item and item:getFullType() == "Base.HandmadeMap" then
-        local listEntry = context:addOption("Locate yourself", item, NIM_GuessPosition);
+        local listEntry = context:addOption(getText("ContextMenu_LocateFunc"), item, NIM_GuessPosition);
         local tooltip = ISInventoryPaneContextMenu.addToolTip();
-        tooltip.description = "Guess your position on the world map. (You need to be in a known region)"
-        tooltip:setName("Locate yourself")
+        tooltip.description = getText("ContextMenu_LocateDesc")
+        tooltip:setName(getText("ContextMenu_LocateFunc"))
         listEntry.toolTip = tooltip;
     end
 end
@@ -66,10 +66,10 @@ function NIM_ISMapTrackingContext:AddRegionsFromMemory(item, index, player, cont
         end
 
         if haveNeededItems then
-            local listEntry = context:addOption("Add Region", item, function() NIM_TransferRegions(item) end);
+            local listEntry = context:addOption(getText("ContextMenu_AddRegionFunc"), item, function() NIM_TransferRegions(item) end);
             local tooltip = ISInventoryPaneContextMenu.addToolTip();
-            tooltip.description = "Add regions to the World map from memory. (Regions that you have visited)"
-            tooltip:setName("Add Region")
+            tooltip.description = getText("ContextMenu_AddRegionDesc")
+            tooltip:setName(getText("ContextMenu_AddRegionFunc"))
             listEntry.toolTip = tooltip;
         end
     end
@@ -86,18 +86,18 @@ function NIM_GuessPosition()
     local playerCanSeeOutside = player:getSquare():isAdjacentToWindow()
 
     local outsideErrMessages = {
-        "I can't guess where I am. I need to take a look outside",
-        "Can't do it inside, I need to check my surroundings"
+        getText("IGUI_isInsideF"),
+        getText("IGUI_isInsideS")
     }
 
     local unknownErrMessages = {
-        "I have no idea where I am",
-        "I don't known this place"
+        getText("IGUI_unknownRegionF"),
+        getText("IGUI_unknownRegionS")
     }
 
     local failedGuessErrMessages = {
-        "Hmmmmm, somewhere around here?",
-        "Maybe in this area..."
+        getText("IGUI_failedGuessF"),
+        getText("IGUI_failedGuessS")
     }
 
     if not isOutside and not playerCanSeeOutside then

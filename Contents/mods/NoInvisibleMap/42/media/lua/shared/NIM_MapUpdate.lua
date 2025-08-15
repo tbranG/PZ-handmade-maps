@@ -46,12 +46,13 @@ function NIM_CreateMemoryRegion(playerObj, playerModData)
 end
 
 
--- Utils ####################################
-function NIM_GetDistance(a, b)
+-- Utils ########################################################################
+
+local function NIM_GetDistance(a, b)
     return math.sqrt((math.abs(a.x - b.x))^2 + (math.abs(a.y - b.y))^2)
 end
 
-function NIM_GetGreater(a, b)
+local function NIM_GetGreater(a, b)
     if a > b then
         return a
     else
@@ -59,14 +60,15 @@ function NIM_GetGreater(a, b)
     end
 end
 
-function NIM_GetLower(a, b)
+local function NIM_GetLower(a, b)
     if a > b then
         return b
     else
         return a
     end
 end
--- ##########################################
+
+-- ###############################################################################
 
 
 function NIM_OnTickMapUpdate()

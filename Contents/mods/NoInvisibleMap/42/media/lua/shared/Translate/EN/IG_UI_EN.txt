@@ -1,0 +1,10 @@
+IGUI_EN = {
+    IGUI_isInsideF = "I can't guess where I am. I need to take a look outside",
+    IGUI_isInsideS = "Can't do it inside, I need to check my surroundings",
+
+	IGUI_unknownRegionF = "I have no idea where I am",
+    IGUI_unknownRegionS = "I don't known this place",
+
+    IGUI_failedGuessF = "Hmmmmm, somewhere around here?",
+    IGUI_failedGuessS = "Maybe in this area...",
+}
