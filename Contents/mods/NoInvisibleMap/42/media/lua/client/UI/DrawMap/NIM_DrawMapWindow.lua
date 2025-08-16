@@ -87,6 +87,62 @@ function NIM_DrawMapWindow:initialise()
     end
 
     self.paperTexture = getTexture("media/textures/worldMap/Paper.png")
+    self.character = getPlayer()
+    local playerInv = self.character:getInventory()
+
+    local hasMulticolorItem = function()
+        return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Crayons" end) ~= nil or 
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenMultiColor" end) ~= nil
+    end
+    
+    if hasMulticolorItem() then 
+        return
+    end
+
+    local hasBlack = function()
+        return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Pen" end) ~= nil or 
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Pencil" end) ~= nil or
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenFancy" end) ~= nil or
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenSpiffo" end) ~= nil or
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerBlack" end) ~= nil
+    end
+    local hasRed = function()
+        return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.RedPen" end) ~= nil or 
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerRed" end) ~= nil
+    end
+    local hasBlue = function()
+        return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.BluePen" end) ~= nil or 
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerBlue" end) ~= nil
+    end
+    local hasGreen = function()
+        return playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.GreenPen" end) ~= nil or 
+            playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.MarkerGreen" end) ~= nil
+    end
+
+
+    if not hasBlack() then
+        self.blackBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.blackBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
+        self.blackBtn.enable = false
+    end
+
+    if not hasRed() then
+        self.redBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.redBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
+        self.redBtn.enable = false
+    end
+
+    if not hasBlue() then
+        self.blueBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.blueBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
+        self.blueBtn.enable = false
+    end
+
+    if not hasGreen() then
+        self.greenBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.greenBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
+        self.greenBtn.enable = false
+    end
 end
 
 
@@ -354,6 +410,7 @@ function NIM_DrawMapWindow:onTick()
                     window.pixelMatrix[i].colored = true
 
                     window.coloredPixels = window.coloredPixels + 1
+                    window.character:playSound("Painting")
                 end
             end
         end
