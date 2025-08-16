@@ -1,8 +1,8 @@
 -- this function is called when the map is created. It generates it's map area and store it in it's mod data
-function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor) 
-    if output ~= nil then
-        if output:getMapID() == "CustomMap" then
-            local modData = output:getModData()
+function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor) 
+    if sketch ~= nil then
+        if sketch:getMapID() == "CustomMap" then
+            local modData = sketch:getModData()
 
             --defualt values
             local minX = playerCell:getMinX() - 96
@@ -11,7 +11,7 @@ function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zInde
             local maxY = playerCell:getMaxY() + 60
             
             if not outside and not playerCanSeeOutside then
-                output:setName("Empty Sketch")
+                sketch:setName("Empty Sketch")
                 minX = 0
                 minY = 0
                 maxX = 0
@@ -36,48 +36,6 @@ function NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zInde
             modData.mapColor = pencilColor
         end
     end
-end
-
-
-
-function NIM_GenerateMapSingleColor(recipeData, character)
-    local output = recipeData:getFirstCreatedItem()
-    local playerCell = character:getCell()
-
-    local zIndex = character:getZ()
-    local outside = character:isOutside()
-    
-    local playerCanSeeOutside = character:getSquare():isAdjacentToWindow()
-
-    local pencilColor = recipeData:getAllKeepInputItems():get(0):getType()
-
-    if pencilColor == "Pen" or pencilColor == "Pencil" or pencilColor == "PenFancy" or pencilColor == "PenSpiffo" or pencilColor == "MarkerBlack" then
-        pencilColor = "black"
-    elseif pencilColor == "RedPen" or pencilColor == "MarkerRed" then
-        pencilColor = "red"
-    elseif pencilColor == "BluePen" or pencilColor == "MarkerBlue" then
-        pencilColor = "blue"
-    else
-        pencilColor = "green"
-    end
-
-    NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
-end
-
-
-
-function NIM_GenerateMapMultiColor(recipeData, character)
-    local output = recipeData:getFirstCreatedItem()
-    local playerCell = character:getCell()
-
-    local zIndex = character:getZ()
-    local outside = character:isOutside()
-    
-    local playerCanSeeOutside = character:getSquare():isAdjacentToWindow()
-
-    local pencilColor = "multi"
-
-    NIM_GenerateMap(output, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
 end
 
 
