@@ -10,10 +10,18 @@ local COLOR_RED = 1
 local COLOR_BLUE = 2
 local COLOR_GREEN = 3
 
+local AREA_PANE_WIDTH = 100
+local AREA_PANE_HEIGHT = 100
+
+local AREA_Z_0 = {w=AREA_PANE_WIDTH - 90, h=AREA_PANE_HEIGHT - 90, r=1, g=0, b=0}
+local AREA_Z_1 = {w=AREA_PANE_WIDTH - 70, h=AREA_PANE_HEIGHT - 70, r=1, g=100/255, b=0}
+local AREA_Z_2 = {w=AREA_PANE_WIDTH - 30, h=AREA_PANE_HEIGHT - 30, r=1, g=1, b=100/255}
+local AREA_Z_3 = {w=AREA_PANE_WIDTH, h=AREA_PANE_HEIGHT, r=0, g=1, b=0}
+
 function NIM_DrawMapWindow:prerender()
     ISPanel.prerender(self)
 
-    local titleText = "Sketching"
+    local titleText = getText("UI_DrawMapTitle")
     self:drawText(titleText, self.width/2 - (getTextManager():MeasureStringX(UIFont.Small, titleText) / 2), 10, 1,1,1,1, UIFont.Small)
     self:drawRectBorder(0, 30, self.width, WINDOW_HEIGHT-60, 1, 0.4, 0.4, 0.4)
 
@@ -26,14 +34,71 @@ function NIM_DrawMapWindow:prerender()
     self:drawRectBorder(sketchBorderX, sketchBorderY, sketchBorderWidth, sketchBorderHeight, 1, 0.7, 0.7, 0.7)
     self:drawRectBorder(sketchBorderX + 495, sketchBorderY, sketchBorderWidth / 3, sketchBorderHeight / 2.2, 1, 0.7, 0.7, 0.7)
     
-    self:drawText("Select color:", 560, 45, 1,1,1,1, UIFont.Small)
+    self:drawText(getText("UI_DrawMapColorSelect"), 560, 45, 1,1,1,1, UIFont.Small)
+    self:drawText(getText("UI_DrawMapAltitude"), 560, 230, 1,1,1,1, UIFont.Small)
+    -- self:drawText(getText("UI_DrawMapTipTitle"), 580, 230, 1,1,1,1, UIFont.Small)
+    -- self:drawText(getText("UI_DrawMapTipDesc"), 545, 250, 1,1,1,1, UIFont.Small)
+
+    self:drawRectBorder(sketchBorderX + 495, sketchBorderY + 183, sketchBorderWidth / 3, sketchBorderHeight / 1.9, 1, 0.7, 0.7, 0.7)
+
 end
 
 
 function NIM_DrawMapWindow:render()
     local offsetX = 20
     local offsetY = 40
+
+    local paperTextureWidth = 480
+    local paperTextureHeight = 380
+
+    local paperTextureX = 18
+    local paperTextureY = 38
+
+    local isPlayerOutside = self.character:isOutside()
+    local playerCanSeeOutside = self.character:getSquare():isAdjacentToWindow()
+    local tooDark = self.character:tooDarkToRead()
+
+    local playerHeight = math.floor(self.character:getZ())
+
+    if playerHeight < 0 then
+        playerHeight = 0
+    else
+        playerHeight = math.min(playerHeight, 3)
+    end
+
+
+    -- Altitude UI
+    self.altitude:drawRectBorder(
+        (AREA_PANE_WIDTH / 2) - (self.altitudes[playerHeight+1].w / 2),
+        (AREA_PANE_HEIGHT / 2) - (self.altitudes[playerHeight+1].h / 2),
+        self.altitudes[playerHeight+1].w,
+        self.altitudes[playerHeight+1].h,
+        0.8,
+        self.altitudes[playerHeight+1].r,
+        self.altitudes[playerHeight+1].g,
+        self.altitudes[playerHeight+1].b
+    )
     
+    -- Sketching unavailable UI
+    if (not isPlayerOutside and not playerCanSeeOutside) or tooDark then
+        local displayText = getText("UI_DrawMapBlock1")
+
+        if tooDark then
+            displayText = getText("UI_DrawMapBlock2")
+        end
+
+        self:drawRect(paperTextureX, paperTextureY, paperTextureWidth, paperTextureHeight, 0.3, 1, 0, 0)
+        self:drawText(
+            displayText, 
+            (paperTextureX - 175) + (paperTextureWidth / 2), 
+            (paperTextureY - 10) + (paperTextureHeight / 2), 
+            1, 1, 1, 1, 
+            UIFont.Small
+        )
+        return
+    end
+
+    -- Pixel Matrix for drawing
     for i = 1, #self.pixelMatrix do
         self:drawRect(
             self.pixelMatrix[i].x + offsetX, 
@@ -47,14 +112,10 @@ function NIM_DrawMapWindow:render()
         )
     end
 
-    local paperTextureWidth = 480
-    local paperTextureHeight = 380
-
-    local paperTextureX = 15
-    local paperTextureY = 35
-
+    -- Paper texture
     self:drawTextureScaled(self.paperTexture, paperTextureX, paperTextureY, paperTextureWidth, paperTextureHeight, 0.3, 1, 1, 1)
 
+    -- Pencil aim
     if self.canDraw then
         self:drawRectBorder(self:getMouseX() - 5, self:getMouseY() - 5, 20, 20, 1, 1, 100/255, 0)
     end
@@ -80,6 +141,9 @@ function NIM_DrawMapWindow:initialise()
     self:create()
     NIM_DrawMapWindow.instance = self
 
+    self.altitudes = { AREA_Z_0, AREA_Z_1, AREA_Z_2, AREA_Z_3 }
+
+    -- Counting how many pixels we have to color
     for i = 1, #self.pixelMatrix do
         if self.pixelMatrix[i].toColor == true then
             self.pixelsToColor = self.pixelsToColor + 1
@@ -121,25 +185,25 @@ function NIM_DrawMapWindow:initialise()
 
 
     if not hasBlack() then
-        self.blackBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.blackBtn.borderColor = {r=1, g=0, b=0, a=0.1};
         self.blackBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
         self.blackBtn.enable = false
     end
 
     if not hasRed() then
-        self.redBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.redBtn.borderColor = {r=1, g=0, b=0, a=0.1};
         self.redBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
         self.redBtn.enable = false
     end
 
     if not hasBlue() then
-        self.blueBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.blueBtn.borderColor = {r=1, g=0, b=0, a=0.1};
         self.blueBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
         self.blueBtn.enable = false
     end
 
     if not hasGreen() then
-        self.greenBtn.borderColor = {r=1, g=1, b=1, a=0.3};
+        self.greenBtn.borderColor = {r=1, g=0, b=0, a=0.1};
         self.greenBtn.backgroundColor = {r=0, g=0, b=0, a=0.3};
         self.greenBtn.enable = false
     end
@@ -149,6 +213,11 @@ end
 function NIM_DrawMapWindow:create()
     local btnHgt = FONT_HGT_SMALL + 2 * 4
     local padBottom = 10
+
+    self.altitude = ISPanel:new(WINDOW_WIDTH - 140, WINDOW_HEIGHT - 180, AREA_PANE_WIDTH, AREA_PANE_HEIGHT)
+    self.altitude:initialise();
+    self.altitude:instantiate();
+    self:addChild(self.altitude);
 
     self.finish = ISButton:new((self:getWidth() / 2) - 100, self:getHeight() - 25, 100, 20, "Finish", self, NIM_DrawMapWindow.onOptionMouseDown);
     self.finish.internal = "FINISH";
@@ -172,14 +241,14 @@ function NIM_DrawMapWindow:create()
     self.exit.borderColor = {r=1, g=1, b=1, a=0.3};
     self:addChild(self.exit);
 
-    self.blackBtn = ISButton:new(515, 75, 150, 25, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_BLACK) end);
+    self.blackBtn = ISButton:new(525, 70, 60, 60, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_BLACK) end);
     self.blackBtn.internal = "COLOR_BLACK";
     self.blackBtn:initialise();
     self.blackBtn:instantiate();
     self.blackBtn.borderColor = {r=1, g=1, b=1, a=0.3};
     self:addChild(self.blackBtn);
 
-    self.redBtn = ISButton:new(515, 105, 150, 25, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_RED) end);
+    self.redBtn = ISButton:new(590, 70, 60, 60, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_RED) end);
     self.redBtn.internal = "COLOR_RED";
     self.redBtn:initialise();
     self.redBtn:instantiate();
@@ -187,7 +256,7 @@ function NIM_DrawMapWindow:create()
     self.redBtn.borderColor = {r=1, g=1, b=1, a=0.3};
     self:addChild(self.redBtn);
 
-    self.blueBtn = ISButton:new(515, 135, 150, 25, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_BLUE) end);
+    self.blueBtn = ISButton:new(525, 135, 60, 60, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_BLUE) end);
     self.blueBtn.internal = "COLOR_BLUE";
     self.blueBtn:initialise();
     self.blueBtn:instantiate();
@@ -195,7 +264,7 @@ function NIM_DrawMapWindow:create()
     self.blueBtn.borderColor = {r=1, g=1, b=1, a=0.3};
     self:addChild(self.blueBtn);
 
-    self.greenBtn = ISButton:new(515, 165, 150, 25, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_GREEN) end);
+    self.greenBtn = ISButton:new(590, 135, 60, 60, "", self, function() NIM_DrawMapWindow:onColorSelect(COLOR_GREEN) end);
     self.greenBtn.internal = "COLOR_GREEN";
     self.greenBtn:initialise();
     self.greenBtn:instantiate();
@@ -359,20 +428,31 @@ function NIM_DrawMapWindow:onColorSelect(color)
     window.canDraw = true;
 
     window.blackBtn.enable = false;
+    window.blackBtn.backgroundColor.a = 0.1;
+
     window.redBtn.enable = false;
+    window.redBtn.backgroundColor.a = 0.1;
+    
     window.blueBtn.enable = false;
+    window.blueBtn.backgroundColor.a = 0.1;
+
     window.greenBtn.enable = false;
+    window.greenBtn.backgroundColor.a = 0.1;
 end
 
 
 function NIM_DrawMapWindow:onTick()
     local window = NIM_DrawMapWindow.instance
 
-    if window == nil then
+    if window == nil or not window.canDraw then
         return
     end
 
-    if not window.canDraw then
+    local isPlayerOutside = window.character:isOutside()
+    local playerCanSeeOutside = window.character:getSquare():isAdjacentToWindow()
+    local tooDark = window.character:tooDarkToRead()
+
+    if (not isPlayerOutside and not playerCanSeeOutside) or tooDark then
         return
     end
 

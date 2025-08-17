@@ -1,0 +1,11 @@
+UI_EN = {
+    UI_DrawMapTitle = "Sketching",
+    UI_DrawMapColorSelect = "Select color:",
+    UI_DrawMapTipTitle = "Tip:",
+    UI_DrawMapTipDesc = "Fill all dark tiles",
+    UI_DrawMapBlock1 = "Sketching unavailable. You need to be outside or next to a window.",
+    UI_DrawMapBlock2 = "Sketching unavailable. Too dark.",
+    UI_DrawMapAltitude = "Map Area:",
+
+    UI_TransferRegionTitle = "Add Region"
+}

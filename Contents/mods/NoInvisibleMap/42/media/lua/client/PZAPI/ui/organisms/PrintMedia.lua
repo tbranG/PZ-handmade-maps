@@ -283,6 +283,11 @@ UI.PrintMedia = UI.Window{
                     local yy = 0
                     local maxLen = 0
                     
+                    local r, g, b
+                    r = 0
+                    g = 0
+                    b = 0
+
                     local playerObj = getPlayer()
                     local modData = playerObj:getModData()
                     local playerInv = playerObj:getInventory()
@@ -297,9 +302,9 @@ UI.PrintMedia = UI.Window{
                         newSymbol.symbol = "Question"
                         newSymbol.x = math.ceil((sqData.x1 + sqData.x2) / 2)
                         newSymbol.y = math.ceil((sqData.y1 + sqData.y2) / 2)
-                        newSymbol.r = 0.129
-                        newSymbol.g = 0.129
-                        newSymbol.b = 0.129
+                        newSymbol.r = r
+                        newSymbol.g = g
+                        newSymbol.b = b
 
                         local isPOInew = true
 
@@ -312,7 +317,7 @@ UI.PrintMedia = UI.Window{
                                 r = newSymbol.r,
                                 g = newSymbol.g,
                                 b = newSymbol.b,
-                                scale = 1.5
+                                scale = 1.6
                             })
 
                             modData.pointsOfInterest = data
@@ -334,7 +339,7 @@ UI.PrintMedia = UI.Window{
                                     r = newSymbol.r,
                                     g = newSymbol.g,
                                     b = newSymbol.b,
-                                    scale = 1.5
+                                    scale = 1.6
                                 })
                             end
                         end
@@ -353,7 +358,6 @@ UI.PrintMedia = UI.Window{
                         ISTimedActionQueue.clear(playerObj)
                         ISTimedActionQueue.add(ISReadWorldMap:new(playerObj, centerX, centerY, getMapZoom(maxLen)))
                     else
-                        
                         playerObj:Say("I can check that later")
                     end
                 end

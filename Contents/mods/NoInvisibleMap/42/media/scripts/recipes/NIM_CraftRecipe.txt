@@ -9,7 +9,7 @@ module Base
         OnCreate = NIM_generateWorldMapId,
         inputs 
         {
-            item 4 [Base.SheetPaper2],
+            item 6 [Base.SheetPaper2],
             item 1 tags[Tape],
         }
         outputs
@@ -27,8 +27,26 @@ module Base
         OnCreate = NIM_generateWorldMapId,
         inputs 
         {
-            item 4 [Base.SheetPaper2],
+            item 6 [Base.SheetPaper2],
             item 1 [Base.Stapler] mode:keep,
+        }
+        outputs
+        {
+            item 1 Base.HandmadeMap,
+        }
+    }
+
+    craftRecipe CreateHandmadeMap3
+    {
+        timedAction = Making,
+        Time = 100,
+        Tags = InHandCraft,
+        category = Miscellaneous,
+        OnCreate = NIM_generateWorldMapId,
+        inputs 
+        {
+            item 6 [Base.SheetPaper2],
+            item 3 [Base.Paperclip],
         }
         outputs
         {
