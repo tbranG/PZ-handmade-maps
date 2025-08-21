@@ -297,7 +297,6 @@ function NIM_ISWorldMapOverrides()
         o.showRemotePlayers = false
         o.showPlayerNames = false
         o.hideUnvisitedAreas = true
-        o.unvisitedBlur = false
         o.isometric = false
         o.character = nil
         o.playerNum = character and character:getPlayerNum() or 0
@@ -373,6 +372,49 @@ function NIM_ISWorldMapOverrides()
     end
 
     -- function override
+    -- disabling default annotations
+    function ISWorldMap:initDataAndStyle()
+        local mapAPI = self.mapAPI
+        if MainScreen.instance.inGame then
+            MapUtils.initDefaultMapData(self)
+            mapAPI:setBoundsFromWorld()
+            MapUtils.initDefaultStreetData(self)
+            self.hideUnvisitedAreas = true
+        else
+            -- TEST in main menu
+            MapUtils.initDirectoryMapData(self, 'media/maps/Muldraugh, KY')
+            mapAPI:setBoundsFromData()
+            local markers = mapAPI:getMarkersAPI()
+            markers:addGridSquareMarker(11342, 6779, 50, 1.0, 1.0, 0.0, 1.0)
+            self.hideUnvisitedAreas = false
+        end
+        MapUtils.initDefaultStyleV3(self)
+        MapUtils.overlayPaper(self)
+        --mapAPI:getSymbolsAPIv2():initDefaultAnnotations()
+    end
+
+    -- function override
+    -- removes default annotations and removes blur
+    function ISWorldMap:prerender()
+        ISPanelJoypad.prerender(self)
+        --self.mapAPI:getSymbolsAPIv2():initDefaultAnnotations() -- only needed when the map editor changed things
+        self.symbolsUI:prerenderMap()
+        if self.mapAPI:getBoolean("ColorblindPatterns") ~= getCore():getOptionColorblindPatterns() then
+            MapUtils.initDefaultStyleV1(self)
+            MapUtils.overlayPaper(self)
+        end
+        self:renderPrintMedia()
+        self:renderStashMaps()
+        self:positionStashMap()
+        MapUtils.renderDarkModeOverlay(self)
+        self:pickMouseOverStreet()
+        if TERRAIN_IMAGE then
+            self:checkTerrainImage()
+        end
+        self.mapAPI:setBoolean("BlurUnvisited", false)
+    end
+
+    -- function override
     -- adding NIM_AddMapData call
     function ISWorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
         local player = getPlayer()
@@ -436,9 +478,9 @@ function NIM_ISWorldMapOverrides()
             local mapAPI = mapUI.javaObject:getAPIv1()
 
             --new background color
-            local r,g,b = 143/255, 109/255, 54/255
-            mapAPI:setUnvisitedRGBA(r, g, b, 1.0)
-            mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0.1) 
+            local r,g,b = 127/255, 118/255, 108/255
+            mapAPI:setUnvisitedRGBA(r * 0.9, g * 0.9, b *0.9, 1.0)
+            mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0.1) 
 
             return
         end
@@ -465,9 +507,9 @@ function NIM_ISWorldMapOverrides()
         local mapAPI = mapUI.javaObject:getAPIv1()
 
         --new background color
-        local r,g,b = 143/255, 109/255, 54/255
-        mapAPI:setUnvisitedRGBA(r, g, b, 1.0)
-        mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0.1) 
+        local r,g,b = 127/255, 118/255, 108/255
+        mapAPI:setUnvisitedRGBA(r * 0.9, g * 0.9, b *0.9, 1.0)
+        mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0.1) 
 
         if MainScreen.instance.inGame then
             for i=1,getNumActivePlayers() do

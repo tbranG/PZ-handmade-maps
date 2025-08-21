@@ -162,18 +162,21 @@ function NIM_AddRegion(worldMap, inputItem)
     end
 
     mapData.haveNewRegions = true
+
+    local playerObj = getPlayer()
+
+    ISTimedActionQueue.clear(playerObj)
+    ISTimedActionQueue.add(ISReadWorldMap:new(playerObj))
 end
 
 
-
+-- This function is called when you create a world map using one of the three recipes
 function NIM_generateWorldMapId(recipeData, character)
     local output = recipeData:getFirstCreatedItem()
     local modData = output:getModData()
 
     modData.id = NIM_MapIdGenerator()
 end
-
-
 
 function NIM_MapIdGenerator()
     local chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

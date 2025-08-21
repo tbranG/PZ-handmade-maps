@@ -9,6 +9,7 @@ local MOVING_DOWN = 2
 local MOVING_LEFT = 3
 
 -- Method responsible for adding visited regions to the world map
+-- (NOT USED SINCE 3.0.0)
  local function NIM_TransferRegions(item)
     local mapModData = item:getModData()
     local playerModData = getPlayer():getModData()
@@ -424,7 +425,7 @@ function NIM_TransferRegionWindow:create()
             break
         end
 
-        local pane = ISPanel:new(xOffset, 5 + ((i-1) * 55), 200, 50)
+        local pane = ISPanel:new(xOffset, 5 + (((i-1) % 5) * 55), 200, 50)
         pane:initialise();
         pane:instantiate();
         pane.backgroundColor = {r=0, b=0, g=0, a=0};
