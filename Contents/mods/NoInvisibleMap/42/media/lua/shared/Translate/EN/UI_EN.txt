@@ -7,5 +7,7 @@ UI_EN = {
     UI_DrawMapBlock2 = "Sketching unavailable. Too dark.",
     UI_DrawMapAltitude = "Map Area:",
 
-    UI_TransferRegionTitle = "Add Region"
+    UI_TransferRegionTitle = "Add Region",
+    UI_TransferRegionPencilsTooltip = "Pencils:",
+    UI_TransferRegionTooDark = "Mapping unavailable. Too dark"
 }
