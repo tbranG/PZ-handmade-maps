@@ -55,17 +55,248 @@ function NIM_TransferRegionWindow:prerender()
     self:drawText(titleText, self.width/2 - (getTextManager():MeasureStringX(UIFont.Small, titleText) / 2), 10, 1,1,1,1, UIFont.Small)
     self:drawRectBorder(0, 30, self.width, WINDOW_HEIGHT-30, 1, 0.4, 0.4, 0.4)
 
-    local playerInv = getPlayer():getInventory()
-
-    self.itemsPanel:drawText(getText("UI_TransferRegionPencilsTooltip"), 15, 40, 1,1,1,1, UIFont.Medium)
+    self.itemsPanel:drawText(getText("UI_TransferRegionPencilsTooltip"), 25, 35, 1,1,1,1, UIFont.Medium)
     self:drawRectBorder(195, 53, 1, 70, 0.3, 1, 1, 1)
 
     -- ======================= displaying pencil icons =======================
+    if self.multicolorItemRef ~= nil then
+        self.multiColorItem:drawItemIcon(self.multicolorItemRef, 7, 7, 1, 30, 30)
+    else
+        self.multiColorItem.borderColor = {r=1, g=0, b=0, a=0.3}
+    end
+
+    if self.blackItemRef ~= nil then
+        self.blackItem:drawItemIcon(self.blackItemRef, 7, 7, 1, 30, 30)
+    else
+        self.blackItem.borderColor = {r=1, g=0, b=0, a=0.3}
+    end
+
+    if self.redItemRef ~= nil then
+        self.redItem:drawItemIcon(self.redItemRef, 7, 7, 1, 30, 30)
+    else
+        self.redItem.borderColor = {r=1, g=0, b=0, a=0.3}
+    end
+
+    if self.blueItemRef ~= nil then
+        self.blueItem:drawItemIcon(self.blueItemRef, 7, 7, 1, 30, 30)
+    else
+        self.blueItem.borderColor = {r=1, g=0, b=0, a=0.3}
+    end
+
+    if self.greenItemRef ~= nil then
+        self.greenItem:drawItemIcon(self.greenItemRef, 7, 7, 1, 30, 30)
+    else
+        self.greenItem.borderColor = {r=1, g=0, b=0, a=0.3}
+    end
+
+    -- ================ drawing grid =================
+    for i = 1, #self.pixelMatrix do
+        self:drawRectBorder(
+            self.pixelMatrix[i].x, 
+            self.pixelMatrix[i].y, 
+            50, 
+            50,
+            0.7, 
+            0.4, 
+            0.4, 
+            0.4
+        )
+    end
+
+    -- ================ displaying map inputs =================
+    for i = 1, #self.mapInputs do
+        local item = self.playerMapItems:get(i-1)
+        if item ~= nil then
+            self.mapInputs[i]:drawItemIcon(item, 7, 8, 1, 30, 30)
+            self.mapInputs[i]:drawText(
+                item:getName(),
+                50, 
+                15, 
+                1, 1, 1, 1, 
+                UIFont.Small
+            )
+        end
+    end
+end
+
+
+function NIM_TransferRegionWindow:render()
+    local paperTextureWidth = 400
+    local paperTextureHeight = 350
+
+    local paperTextureX = 450
+    local paperTextureY = 40
+
+    for i = 1, #self.mapInputs do
+        if self.selectedInput == i then
+            self.mapInputs[i].backgroundColor = {r=0, g=1, b=0, a=0.3}
+        else
+            self.mapInputs[i].backgroundColor = {r=0, g=0, b=0, a=0}
+        end
+    end
+
+    local tooDark = self.character:tooDarkToRead()
+
+    if tooDark then
+        self:drawRect(
+            paperTextureX, 
+            paperTextureY, 
+            paperTextureWidth, 
+            paperTextureHeight,
+            0.3,
+            1,
+            0,
+            0
+        )
+
+        self:drawText(
+            getText("UI_TransferRegionTooDark"),
+            (paperTextureX - 100) + (paperTextureWidth / 2), 
+            (paperTextureY - 10) + (paperTextureHeight / 2), 
+            1, 1, 1, 1, 
+            UIFont.Medium
+        )
+        return
+    end
+
+    if self.multicolorItemRef == nil and (
+        self.redItemRef == nil or
+        self.blackItemRef == nil or
+        self.greenItemRef == nil or
+        self.blueItemRef == nil
+    ) then
+        self:drawRect(
+            paperTextureX, 
+            paperTextureY, 
+            paperTextureWidth, 
+            paperTextureHeight,
+            0.3,
+            1,
+            0,
+            0
+        )
+
+        self:drawText(
+            getText("UI_TransferRegionMissingPencils"),
+            (paperTextureX - 100) + (paperTextureWidth / 2), 
+            (paperTextureY - 10) + (paperTextureHeight / 2), 
+            1, 1, 1, 1, 
+            UIFont.Medium
+        )
+        return
+    end
+
+    if not self.mapInputSelected then return end
+
+    for i = 1, #self.pixelMatrix do
+        if self.pixelMatrix[i].filled then
+            self:drawRect(
+                self.pixelMatrix[i].x, 
+                self.pixelMatrix[i].y, 
+                50, 
+                50,
+                1,
+                (246 - self.pixelMatrix[i].colorOffset)/255,
+                (217 - self.pixelMatrix[i].colorOffset)/255,
+                (159 - self.pixelMatrix[i].colorOffset)/255
+            )
+
+            -- Paper texture
+            self:drawTextureScaled(
+                self.paperTexture, 
+                self.pixelMatrix[i].x, 
+                self.pixelMatrix[i].y, 
+                50, 
+                50,
+                0.3, 
+                (246 - self.pixelMatrix[i].colorOffset)/255,
+                (217 - self.pixelMatrix[i].colorOffset)/255,
+                (159 - self.pixelMatrix[i].colorOffset)/255
+            )
+        else
+            self:drawRect(
+                self.pixelMatrix[i].x, 
+                self.pixelMatrix[i].y, 
+                50, 
+                50,
+                0.2, 
+                148/255, 
+                99/255, 
+                32/255
+            )
+        end
+
+        if self.pixelMatrix[i].toFill and not self.pixelMatrix[i].filled then
+            self:drawRectBorder(
+                self.pixelMatrix[i].x + 17, 
+                self.pixelMatrix[i].y + 17, 
+                16, 
+                16,
+                1, 
+                1, 
+                0, 
+                0
+            )
+        end
+    end
+
+    if self.selectedPixel ~= -1 then
+        self:drawRectBorder(
+            self.pixelMatrix[self.selectedPixel].x, 
+            self.pixelMatrix[self.selectedPixel].y, 
+            51, 
+            51,
+            1, 
+            0, 
+            0, 
+            1
+        )
+    end
+end
+
+
+function NIM_TransferRegionWindow:new(x, y, width, height)
+    local o = {};
+    o = ISPanel:new(x, y, width, height);
+    setmetatable(o, self);
+    self.__index = self;
+    o.variableColor={r=0.9, g=0.55, b=0.1, a=1};
+    o.borderColor = {r=0.4, g=0.4, b=0.4, a=1};
+    o.backgroundColor = {r=0, g=0, b=0, a=0.8};
+    o.zOffsetSmallFont = 25;
+    o.moveWithMouse = true;
+    return o;
+end
+
+
+function NIM_TransferRegionWindow:initialise()
+    ISPanel.initialise(self)
+    self:create()
+    NIM_TransferRegionWindow.instance = self
+
+    self.pixelsToFill = 0
+
+    for i = 1, 3 do
+        local validSelection = false
+        repeat
+            local selectedPixel = ZombRand(1, #self.pixelMatrix)
+
+            if not self.pixelMatrix[selectedPixel].filled then
+                self.pixelMatrix[selectedPixel].toFill = true
+                validSelection = true
+                self.pixelsToFill = self.pixelsToFill + 1
+            end
+        until (validSelection)
+    end
+
+    self.character = getPlayer()
+    local playerInv = self.character:getInventory()
+
     local getMulticolorItem = function()
         local crayon = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.Crayons" end) 
         if crayon ~= nil then return crayon end
         
-        local multicolorPen = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenMultiColor" end) ~= nil
+        local multicolorPen = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.PenMultiColor" end)
         if multicolorPen ~= nil then return multicolorPen end
     end
     local getBlackItem = function()
@@ -106,182 +337,13 @@ function NIM_TransferRegionWindow:prerender()
         if markerGreen ~= nil then return markerGreen end
     end
 
+    self.multicolorItemRef = getMulticolorItem()
+    self.blackItemRef = getBlackItem()
+    self.redItemRef = getRedItem()
+    self.blueItemRef = getBlueItem()
+    self.greenItemRef = getGreenItem()
 
-    local multicolorItem = getMulticolorItem()
-    local blackItem = getBlackItem()
-    local redItem = getRedItem()
-    local blueItem = getBlueItem()
-    local greenItem = getGreenItem()
-
-    if multicolorItem ~= nil then
-        self.multiColorItem:drawItemIcon(multicolorItem, 7, 7, 1, 30, 30)
-    else
-        self.multiColorItem.borderColor = {r=1, g=0, b=0, a=0.3}
-    end
-
-    if blackItem ~= nil then
-        self.blackItem:drawItemIcon(blackItem, 7, 7, 1, 30, 30)
-    else
-        self.blackItem.borderColor = {r=1, g=0, b=0, a=0.3}
-    end
-
-    if redItem ~= nil then
-        self.redItem:drawItemIcon(redItem, 7, 7, 1, 30, 30)
-    else
-        self.redItem.borderColor = {r=1, g=0, b=0, a=0.3}
-    end
-
-    if blueItem ~= nil then
-        self.blueItem:drawItemIcon(blueItem, 7, 7, 1, 30, 30)
-    else
-        self.blueItem.borderColor = {r=1, g=0, b=0, a=0.3}
-    end
-
-    if greenItem ~= nil then
-        self.greenItem:drawItemIcon(greenItem, 7, 7, 1, 30, 30)
-    else
-        self.greenItem.borderColor = {r=1, g=0, b=0, a=0.3}
-    end
-
-    -- ================ drawing grid =================
-    for i = 1, #self.pixelMatrix do
-        self:drawRectBorder(
-            self.pixelMatrix[i].x, 
-            self.pixelMatrix[i].y, 
-            50, 
-            50,
-            0.7, 
-            0.4, 
-            0.4, 
-            0.4
-        )
-    end
-
-end
-
-
-function NIM_TransferRegionWindow:render()
-    local paperTextureWidth = 400
-    local paperTextureHeight = 350
-
-    local paperTextureX = 450
-    local paperTextureY = 40
-
-    local tooDark = self.character:tooDarkToRead()
-
-    if tooDark then
-        self:drawRect(
-            paperTextureX, 
-            paperTextureY, 
-            paperTextureWidth, 
-            paperTextureHeight,
-            0.3,
-            1,
-            0,
-            0
-        )
-
-        self:drawText(
-            getText("UI_TransferRegionTooDark"),
-            (paperTextureX - 100) + (paperTextureWidth / 2), 
-            (paperTextureY - 10) + (paperTextureHeight / 2), 
-            1, 1, 1, 1, 
-            UIFont.Medium
-        )
-        return
-    end
-
-    if not self.mapInputSelected then return end
-
-    for i = 1, #self.pixelMatrix do
-        if self.pixelMatrix[i].filled then
-            self:drawRect(
-                self.pixelMatrix[i].x, 
-                self.pixelMatrix[i].y, 
-                50, 
-                50,
-                1,
-                246/255,
-                217/255,
-                159/255
-            )
-        else
-            self:drawRect(
-                self.pixelMatrix[i].x, 
-                self.pixelMatrix[i].y, 
-                50, 
-                50,
-                0.1, 
-                204/255, 
-                178/255, 
-                123/255
-            )
-        end
-
-        if self.pixelMatrix[i].toFill then
-            self:drawRectBorder(
-                self.pixelMatrix[i].x + 12.5, 
-                self.pixelMatrix[i].y + 12.5, 
-                25, 
-                25,
-                1, 
-                1, 
-                0, 
-                0
-            )
-        end
-    end
-
-    -- Paper texture
-    self:drawTextureScaled(self.paperTexture, paperTextureX, paperTextureY, paperTextureWidth, paperTextureHeight, 0.25, 246/255, 217/255, 159/255)
-
-    if self.selectedPixel ~= -1 then
-        self:drawRectBorder(
-            self.pixelMatrix[self.selectedPixel].x, 
-            self.pixelMatrix[self.selectedPixel].y, 
-            51, 
-            51,
-            1, 
-            0, 
-            1, 
-            0
-        )
-    end
-end
-
-
-function NIM_TransferRegionWindow:new(x, y, width, height)
-    local o = {};
-    o = ISPanel:new(x, y, width, height);
-    setmetatable(o, self);
-    self.__index = self;
-    o.variableColor={r=0.9, g=0.55, b=0.1, a=1};
-    o.borderColor = {r=0.4, g=0.4, b=0.4, a=1};
-    o.backgroundColor = {r=0, g=0, b=0, a=0.8};
-    o.zOffsetSmallFont = 25;
-    o.moveWithMouse = true;
-    return o;
-end
-
-
-function NIM_TransferRegionWindow:initialise()
-    ISPanel.initialise(self)
-    self:create()
-    NIM_TransferRegionWindow.instance = self
-
-    for i = 1, 3 do
-        local validSelection = false
-        repeat
-            local selectedPixel = ZombRand(1, #self.pixelMatrix)
-
-            if not self.pixelMatrix[selectedPixel].filled then
-                self.pixelMatrix[selectedPixel].toFill = true
-                validSelection = true
-            end
-        until (validSelection)
-    end
-
-    self.mapInputSelected = true
+    self.mapInputSelected = false
     self.selectedPixel = -1
 
     self.movingPixel = false
@@ -290,7 +352,6 @@ function NIM_TransferRegionWindow:initialise()
     self.tickSize = 10000
     self.tickCounter = 0
 
-    self.character = getPlayer()
     self.paperTexture = getTexture("media/textures/worldMap/Paper.png")
 end
 
@@ -344,10 +405,53 @@ function NIM_TransferRegionWindow:create()
 
 
     --Map input panel
-    self.inputPanel = ISPanel:new(10, 150, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 1.6)
+    self.inputPanel = ISPanel:new(10, 150, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 1.55)
     self.inputPanel:initialise();
     self.inputPanel:instantiate();
+    self.inputPanel.backgroundColor = {r=0, b=0, g=0, a=0};
     self:addChild(self.inputPanel);
+
+    self.playerMapItems = getPlayer():getInventory():getAllEvalRecurse(function(item) return item:getDisplayCategory() == "Cartography" and item:getFullType() ~= "Base.HandmadeMap" end)
+    self.mapInputs = {}
+
+    local xOffset = 5
+    for i = 1, self.playerMapItems:size() do
+        if i == 6 then
+            xOffset = xOffset + 205
+        end
+
+        if i > 10 then
+            break
+        end
+
+        local pane = ISPanel:new(xOffset, 5 + ((i-1) * 55), 200, 50)
+        pane:initialise();
+        pane:instantiate();
+        pane.backgroundColor = {r=0, b=0, g=0, a=0};
+        self.inputPanel:addChild(pane);
+
+        local button = ISButton:new(0, 0, 200, 50, "", self, function()
+            self.mapInputSelected = true;
+            self.selectedInput = i;
+            self.targetMapItem = self.playerMapItems:get(i-1);
+        end);
+        button.internal = "MAP_INPUT_" .. i;
+        button:initialise();
+        button:instantiate();
+        button.backgroundColor = {r=0, g=0, b=0, a=0};
+        pane:addChild(button);
+
+        table.insert(self.mapInputs, pane);
+    end
+
+    --buttons
+    self.finish = ISButton:new(self:getWidth() - 110, self:getHeight() - 55, 100, 45, "Finish", self, NIM_TransferRegionWindow.onOptionMouseDown)
+    self.finish.internal = "FINISH";
+    self.finish:initialise();
+    self.finish:instantiate();
+    self.finish.borderColor = {r=1, g=1, b=1, a=0.3};
+    self.finish.enable = false;
+    self:addChild(self.finish);
 
     self.pixelMatrix = {}
     self.filledPixels = 0
@@ -362,12 +466,12 @@ function NIM_TransferRegionWindow:create()
         for j = 1, 8 do
             local isFilled = ZombRand(4) == 0
 
+            local colorOffset = ZombRand(5, 25)
+
             table.insert(self.pixelMatrix, {
                 x = column,
                 y = row,
-                r = 1,
-                g = 1,
-                b = 1,
+                colorOffset = colorOffset,
                 filled = isFilled,
                 toFill = false
             });
@@ -432,7 +536,7 @@ function NIM_TransferRegionWindow:onTick()
             if window.movingDir == MOVING_UP then
                 local newPixel = window.selectedPixel - 8
 
-                if newPixel < 0 or window.pixelMatrix[newPixel].filled then 
+                if newPixel <= 0 or window.pixelMatrix[newPixel].filled then 
                     window.movingPixel = false
                     window.tickCounter = 0
                     return
@@ -444,6 +548,64 @@ function NIM_TransferRegionWindow:onTick()
                 window.selectedPixel = newPixel
 
                 window.tickCounter = 0
+            
+
+            elseif window.movingDir == MOVING_RIGHT then
+                local newPixel = window.selectedPixel + 1
+
+                if window.pixelMatrix[newPixel].filled then 
+                    window.movingPixel = false
+                    window.tickCounter = 0
+                    return
+                end
+
+                window.pixelMatrix[window.selectedPixel].filled = false
+                window.pixelMatrix[newPixel].filled = true
+
+                window.selectedPixel = newPixel
+
+                window.tickCounter = 0
+
+                if newPixel + 1 > #window.pixelMatrix or (newPixel + 1) % 8 == 1 then
+                    window.movingPixel = false
+                end
+
+            elseif window.movingDir == MOVING_DOWN then
+                local newPixel = window.selectedPixel + 8
+
+                if newPixel > #window.pixelMatrix or window.pixelMatrix[newPixel].filled then 
+                    window.movingPixel = false
+                    window.tickCounter = 0
+                    return
+                end
+
+                window.pixelMatrix[window.selectedPixel].filled = false
+                window.pixelMatrix[newPixel].filled = true
+
+                window.selectedPixel = newPixel
+
+                window.tickCounter = 0
+            
+
+            elseif window.movingDir == MOVING_LEFT then
+                local newPixel = window.selectedPixel - 1
+
+                if window.pixelMatrix[newPixel].filled then 
+                    window.movingPixel = false
+                    window.tickCounter = 0
+                    return
+                end
+
+                window.pixelMatrix[window.selectedPixel].filled = false
+                window.pixelMatrix[newPixel].filled = true
+
+                window.selectedPixel = newPixel
+
+                window.tickCounter = 0
+
+                if newPixel - 1 <= 0 or (newPixel - 1) % 8 == 0  then 
+                    window.movingPixel = false
+                end
             end
         else
             tickCounter = tickCounter + 1
@@ -455,6 +617,8 @@ function NIM_TransferRegionWindow:onTick()
     local mouseX = window:getMouseX()
     local mouseY = window:getMouseY()
 
+    local completedSquares = 0
+
     if window.pixelMatrix ~= nil then
         for i = 1, #window.pixelMatrix do
             if (mouseX > window.pixelMatrix[i].x and mouseX < window.pixelMatrix[i].x + 45) and 
@@ -463,18 +627,28 @@ function NIM_TransferRegionWindow:onTick()
                     window.selectedPixel = i
                 end
             end
+
+            if window.pixelMatrix[i].toFill and window.pixelMatrix[i].filled then
+                completedSquares = completedSquares + 1
+            end
         end
+    end
+
+    if completedSquares == window.pixelsToFill then
+        window.finish.enable = true
+    else
+        window.finish.enable = false
     end
 end
 
-function NIM_TransferRegionWindow:onKeyPress(key)
+NIM_TransferRegionWindow.OnKeyPressed = function(key)
     local window = NIM_TransferRegionWindow.instance
 
     if window == nil or window.selectedPixel == -1 then
         return
     end
 
-    if key == Keyboard.KEY_W then
+    if key == Keyboard.KEY_UP then
         window.movingPixel = true
         window.movingDir = MOVING_UP
     elseif key == Keyboard.KEY_DOWN then
@@ -490,4 +664,4 @@ function NIM_TransferRegionWindow:onKeyPress(key)
 end
 
 Events.OnTick.Add(NIM_TransferRegionWindow.onTick)
-Events.OnKeyPressed.Add(NIM_TransferRegionWindow.onKeyPress)
+Events.OnKeyPressed.Add(NIM_TransferRegionWindow.OnKeyPressed)
