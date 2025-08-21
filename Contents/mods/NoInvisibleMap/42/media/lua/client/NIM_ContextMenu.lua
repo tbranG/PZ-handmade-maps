@@ -4,8 +4,8 @@ require "UI/TransferRegion/NIM_TransferRegionWindow"
 
 NIM_HandmadeMapContext = {}
 
-local function openAddRegionMenu(playerObj)
-    NIM_TransferRegionWindow:open()
+local function openAddRegionMenu(worldMap)
+    NIM_TransferRegionWindow:open(worldMap)
 end
 
 local function openDrawMenu(playerObj)

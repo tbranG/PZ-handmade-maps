@@ -40,9 +40,9 @@ end
 
 
 -- This function it's used when you add a loot map to your world map
-function NIM_AddRegion(recipeData, character)
-    local mapData = recipeData:getAllKeepInputItems():get(0):getModData()
-    local sketch = recipeData:getAllKeepInputItems():get(1)
+function NIM_AddRegion(worldMap, inputItem)
+    local mapData = worldMap:getModData()
+    local sketch = inputItem
 
     local mapRegions = mapData.mapRegions
 

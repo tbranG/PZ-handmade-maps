@@ -492,13 +492,15 @@ function NIM_TransferRegionWindow:close()
 end
 
 
-function NIM_TransferRegionWindow:open()
+function NIM_TransferRegionWindow:open(source)
     local modal = NIM_TransferRegionWindow:new(
         Core:getInstance():getScreenWidth()/2 - WINDOW_WIDTH/2, 
         Core:getInstance():getScreenHeight()/2 - 500/2,
         WINDOW_WIDTH, 
         WINDOW_HEIGHT
     )
+    modal.sourceItem = source
+
     modal:initialise()
     modal:addToUIManager()
 end
@@ -514,6 +516,14 @@ function NIM_TransferRegionWindow:onOptionMouseDown(button, x, y)
         self:setVisible(false);
         self:removeFromUIManager();
         self:close()
+    end
+    if button.internal == "FINISH" then
+        if self.mapInputSelected and self.targetMapItem ~= nil then
+            NIM_TransferRegions(self.sourceItem, self.targetMapItem)
+            self:setVisible(false);
+            self:removeFromUIManager();
+            self:close()
+        end
     end
 end
 
