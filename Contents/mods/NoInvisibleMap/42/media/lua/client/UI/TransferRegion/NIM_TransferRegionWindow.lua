@@ -519,7 +519,7 @@ function NIM_TransferRegionWindow:onOptionMouseDown(button, x, y)
     end
     if button.internal == "FINISH" then
         if self.mapInputSelected and self.targetMapItem ~= nil then
-            NIM_TransferRegions(self.sourceItem, self.targetMapItem)
+            NIM_AddRegion(self.sourceItem, self.targetMapItem)
             self:setVisible(false);
             self:removeFromUIManager();
             self:close()

@@ -297,6 +297,7 @@ function NIM_ISWorldMapOverrides()
         o.showRemotePlayers = false
         o.showPlayerNames = false
         o.hideUnvisitedAreas = true
+        o.unvisitedBlur = false
         o.isometric = false
         o.character = nil
         o.playerNum = character and character:getPlayerNum() or 0
@@ -435,10 +436,10 @@ function NIM_ISWorldMapOverrides()
             local mapAPI = mapUI.javaObject:getAPIv1()
 
             --new background color
-            local r,g,b = 127/255, 118/255, 108/255
-            mapAPI:setUnvisitedRGBA(r * 0.915, g * 0.915, b * 0.915, 1.0)
-            mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
-            
+            local r,g,b = 143/255, 109/255, 54/255
+            mapAPI:setUnvisitedRGBA(r, g, b, 1.0)
+            mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0.1) 
+
             return
         end
     
@@ -464,10 +465,10 @@ function NIM_ISWorldMapOverrides()
         local mapAPI = mapUI.javaObject:getAPIv1()
 
         --new background color
-        local r,g,b = 127/255, 118/255, 108/255
-        mapAPI:setUnvisitedRGBA(r * 0.915, g * 0.915, b * 0.915, 1.0)
-        mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0) --set grid to be invisible
-    
+        local r,g,b = 143/255, 109/255, 54/255
+        mapAPI:setUnvisitedRGBA(r, g, b, 1.0)
+        mapAPI:setUnvisitedGridRGBA(1, 1, 1, 0.1) 
+
         if MainScreen.instance.inGame then
             for i=1,getNumActivePlayers() do
                 if getSpecificPlayer(i-1) then
