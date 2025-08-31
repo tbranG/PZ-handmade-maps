@@ -1,6 +1,6 @@
 version=1
 id=3400448921
-title=Handmade maps: A Map Overhaul [B42]
+title=Handmade maps: Interactive Mapping [B42]
 description=[h3]Are you bothered by the fact that your character can just simply grab a map out of thin air and find his way like it's a full fledged GPS system? SPEAK NO MORE! This mod completely overhauls PZ's map system.[/h3]
 description=
 description=[h2]Major changes:[/h2]
