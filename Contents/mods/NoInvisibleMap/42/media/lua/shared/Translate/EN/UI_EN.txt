@@ -10,5 +10,11 @@ UI_EN = {
     UI_TransferRegionTitle = "Add Region",
     UI_TransferRegionPencilsTooltip = "Pencils:",
     UI_TransferRegionTooDark = "Mapping unavailable. Too dark",
-    UI_TransferRegionMissingPencils = "Mapping unavailable. Missing pencils"
+    UI_TransferRegionMissingPencils = "Mapping unavailable. Missing pencils",
+    UI_TransferRegionSelectMapTooltip = "Maps:",
+    UI_TransferRegionPencilMulti = "Multicolor",
+    UI_TransferRegionPencilRed = "Red",
+    UI_TransferRegionPencilBlue = "Blue",
+    UI_TransferRegionPencilGreen = "Green",
+    UI_TransferRegionPencilBlack = "Black"
 }

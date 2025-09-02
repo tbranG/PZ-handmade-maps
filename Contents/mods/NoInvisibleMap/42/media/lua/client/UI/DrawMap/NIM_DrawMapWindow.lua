@@ -117,7 +117,9 @@ function NIM_DrawMapWindow:render()
 
     -- Pencil aim
     if self.canDraw then
-        self:drawRectBorder(self:getMouseX() - 5, self:getMouseY() - 5, 20, 20, 1, 1, 100/255, 0)
+        local aimWidth, aimHeight = 50, 50
+        self:drawRectBorder(self:getMouseX() - (aimWidth / 2), self:getMouseY() - (aimHeight / 2), aimWidth, aimHeight, 1, 0.3, 0.3, 0.3)
+        self:drawRectBorder(self:getMouseX() - (aimWidth / 2) - 1, self:getMouseY() - (aimHeight / 2) - 1, aimWidth, aimHeight, 1, 0.9, 0.9, 0.9)
     end
 end
 
@@ -479,10 +481,15 @@ function NIM_DrawMapWindow:onTick()
         b = 102/255;
     end
 
+    local leftCollisionOffset = -5
+    local rightCollisionOffset = 75
+    local topCollisionOffset = 5
+    local bottomCollisionOffset = 90
+
     if window.pixelMatrix ~= nil then
         for i = 1, #window.pixelMatrix do
-            if (mouseX > window.pixelMatrix[i].x + 20 and mouseX < window.pixelMatrix[i].x + 50) and 
-            (mouseY > window.pixelMatrix[i].y + 40 and mouseY < window.pixelMatrix[i].y + 70) then
+            if (mouseX > window.pixelMatrix[i].x + leftCollisionOffset and mouseX < window.pixelMatrix[i].x + rightCollisionOffset) and 
+            (mouseY > window.pixelMatrix[i].y + topCollisionOffset and mouseY < window.pixelMatrix[i].y + bottomCollisionOffset) then
                 if window.pixelMatrix[i].toColor and not window.pixelMatrix[i].colored then
                     window.pixelMatrix[i].r = r
                     window.pixelMatrix[i].g = g
