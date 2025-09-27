@@ -386,9 +386,10 @@ function NIM_DrawMapWindow:onOptionMouseDown(button, x, y)
         playerInventory:AddItem("Base.AreaSketch")
         
         local sketch = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.AreaSketch" end)
-        local paper = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.SheetPaper2" end)
+        -- local paper = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.SheetPaper2" end)
 
-        playerInventory:Remove(paper)
+        -- playerInventory:Remove(paper)
+        playerInventory:RemoveOneOf("Base.SheetPaper2")
 
         local playerCell = player:getCell()
 
