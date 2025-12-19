@@ -79,7 +79,7 @@ function NIM_OnTickMapUpdate()
     local maxX = playerObj:getX() + 32
     local maxY = playerObj:getY() + 32
 
-    if not playerModData.isWorldMapOpen then
+    if not playerModData.isWorldMapOpen and not Patch_RV_isInside() then
         NIM_CreateMemoryRegion(playerObj, playerModData)
     end
     

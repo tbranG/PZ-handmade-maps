@@ -1,0 +1,10 @@
+ContextMenu_PTBR = {
+	ContextMenu_LocateFunc = "Localizar Posição",
+	ContextMenu_LocateDesc = "Tentar adivinhar sua posição no mapa-múndi. (Você precisa estar em uma região conhecida)",
+
+    ContextMenu_AddRegionFunc = "Adicionar Região",
+    ContextMenu_AddRegionDesc = "Adicionar regiões ao mapa-múndi. (Tanto rascunhos quanto mapas de saque podem ser usados)",
+
+    ContextMenu_SketchFunc = "Desenhar Mapa",
+    ContextMenu_SketchDesc = "Criar um mapa simples da sua localização atual."
+}

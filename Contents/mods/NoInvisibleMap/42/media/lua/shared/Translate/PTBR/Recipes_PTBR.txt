@@ -1,0 +1,6 @@
+Recipes_PTBR = {
+    Recipe_CreateHandmadeMap = "Montar Mapa com Fita Adesiva",
+    Recipe_CreateHandmadeMap2 = "Montar Mapa com Grampeador",
+    Recipe_CreateHandmadeMap3 = "Montar Mapa com Clips de Papel",
+    Recipe_TearPaper = "Rasgar Papel"
+}

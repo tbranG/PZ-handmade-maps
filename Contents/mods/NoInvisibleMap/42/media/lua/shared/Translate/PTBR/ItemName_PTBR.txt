@@ -1,0 +1,4 @@
+ItemName_PTBR = {
+    ItemName_Base.AreaSketch = "Esboço: Arredores",
+    ItemName_Base.HandmadeMap = "Mapa improvisado: Knox Country"
+}

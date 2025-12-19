@@ -69,8 +69,9 @@ function NIM_TransferRegionWindow:prerender()
 
     -- ======================= displaying pencil icons =======================
     if self.multicolorItemRef ~= nil then
+        local textWidth = getTextManager():MeasureStringX(UIFont.Small, getText("UI_TransferRegionPencilMulti"))
         self.multiColorItem:drawItemIcon(self.multicolorItemRef, 7, 7, 1, 30, 30)
-        self.multiColorItem:drawText(getText("UI_TransferRegionPencilMulti"), -3, 50, 1, 1, 1, 1, UIFont.Small)
+        self.multiColorItem:drawText(getText("UI_TransferRegionPencilMulti"), 22 - (textWidth/2), 50, 1, 1, 1, 1, UIFont.Small)
         self.multiColorItem:drawRectBorder(1, 1, self.multiColorItem:getWidth() - 2, self.multiColorItem:getHeight() - 2, 0.7, 1, 1, 1)
     else
         self.multiColorItem.borderColor = {r=1, g=75/255, b=75/255, a=0.7}
@@ -88,8 +89,9 @@ function NIM_TransferRegionWindow:prerender()
     end
 
     if self.redItemRef ~= nil then
+        local textWidth = getTextManager():MeasureStringX(UIFont.Small, getText("UI_TransferRegionPencilRed"))
         self.redItem:drawItemIcon(self.redItemRef, 7, 7, 1, 30, 30)
-        self.redItem:drawText(getText("UI_TransferRegionPencilRed"), 10, 50, 1, 1, 1, 1, UIFont.Small)
+        self.redItem:drawText(getText("UI_TransferRegionPencilRed"), 7 - textWidth, 50, 1, 1, 1, 1, UIFont.Small)
         self.redItem:drawRectBorder(1, 1, self.redItem:getWidth() - 2, self.redItem:getHeight() - 2, 0.7, 1, 1, 1)
     else
         self.redItem.borderColor = {r=1, g=75/255, b=75/255, a=0.7}
@@ -132,7 +134,7 @@ function NIM_TransferRegionWindow:prerender()
         end
     end
 
-    if not self.drawMode && not self.missingPencils then
+    if not self.drawMode and not self.missingPencils then
         if self.selectedMapTexture == 0 then    
             -- drawing map texture
             self.selectedMapTexture = ZombRand(5) + 1
@@ -499,7 +501,7 @@ function NIM_TransferRegionWindow:create()
     self.mapInputs = {}
 
     --buttons
-    self.draw = ISButton:new(self:getWidth() - 220, self:getHeight() - 55, 100, 45, "Draw Visited", self, NIM_TransferRegionWindow.onOptionMouseDown)
+    self.draw = ISButton:new(self:getWidth() - 275, self:getHeight() - 55, 150, 45, getText("UI_TransferRegionVisited"), self, NIM_TransferRegionWindow.onOptionMouseDown)
     self.draw.internal = "DRAW";
     self.draw:initialise();
     self.draw:instantiate();
@@ -507,7 +509,7 @@ function NIM_TransferRegionWindow:create()
     self.draw.enable = true;
     self:addChild(self.draw);
 
-    self.finish = ISButton:new(self:getWidth() - 110, self:getHeight() - 55, 100, 45, "Finish", self, NIM_TransferRegionWindow.onOptionMouseDown)
+    self.finish = ISButton:new(self:getWidth() - 110, self:getHeight() - 55, 100, 45, getText("UI_TransferRegionFinish"), self, NIM_TransferRegionWindow.onOptionMouseDown)
     self.finish.internal = "FINISH";
     self.finish:initialise();
     self.finish:instantiate();

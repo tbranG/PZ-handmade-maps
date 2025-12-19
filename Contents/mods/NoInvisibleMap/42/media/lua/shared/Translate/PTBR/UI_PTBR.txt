@@ -1,0 +1,24 @@
+UI_PTBR = {
+    UI_DrawMapTitle = "Rabiscando",
+    UI_DrawMapColorSelect = "Selecionar cor:",
+    UI_DrawMapTipTitle = "Dica:",
+    UI_DrawMapTipDesc = "Preencha todos os blocos escuros",
+    UI_DrawMapBlock1 = "Não é possível rascunhar. Você precisa estar do lado de fora ou perto de uma janela.",
+    UI_DrawMapBlock2 = "Não é possível rascunhar. Está escuro demais.",
+    UI_DrawMapAltitude = "Área do Mapa:",
+    UI_DrawMapFinish = "Terminar",
+    UI_DrawMapCancel = "Cancelar",
+
+    UI_TransferRegionTitle = "Adicionar Região",
+    UI_TransferRegionPencilsTooltip = "Lápis:",
+    UI_TransferRegionTooDark = "Não é possível mapear. Está escuro demais",
+    UI_TransferRegionMissingPencils = "Não é possível mapear. Faltam lápis",
+    UI_TransferRegionSelectMapTooltip = "Mapas:",
+    UI_TransferRegionPencilMulti = "Multicolorido",
+    UI_TransferRegionPencilRed = "Vermelho",
+    UI_TransferRegionPencilBlue = "Azul",
+    UI_TransferRegionPencilGreen = "Verde",
+    UI_TransferRegionPencilBlack = "Preto",
+    UI_TransferRegionFinish = "Terminar",
+    UI_TransferRegionVisited = "Desenhar da memória"
+}

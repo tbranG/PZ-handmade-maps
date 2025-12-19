@@ -6,6 +6,8 @@ UI_EN = {
     UI_DrawMapBlock1 = "Sketching unavailable. You need to be outside or next to a window.",
     UI_DrawMapBlock2 = "Sketching unavailable. Too dark.",
     UI_DrawMapAltitude = "Map Area:",
+    UI_DrawMapFinish = "Finish",
+    UI_DrawMapCancel = "Cancel",
 
     UI_TransferRegionTitle = "Add Region",
     UI_TransferRegionPencilsTooltip = "Pencils:",
@@ -16,5 +18,7 @@ UI_EN = {
     UI_TransferRegionPencilRed = "Red",
     UI_TransferRegionPencilBlue = "Blue",
     UI_TransferRegionPencilGreen = "Green",
-    UI_TransferRegionPencilBlack = "Black"
+    UI_TransferRegionPencilBlack = "Black",
+    UI_TransferRegionFinish = "Finish",
+    UI_TransferRegionVisited = "Draw from memory"
 }

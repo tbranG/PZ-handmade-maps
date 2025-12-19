@@ -1,0 +1,4 @@
+ItemName_EN = {
+    ItemName_Base.AreaSketch = "Sketch: Surroundings",
+    ItemName_Base.HandmadeMap = "Handmade map: Knox Country"
+}

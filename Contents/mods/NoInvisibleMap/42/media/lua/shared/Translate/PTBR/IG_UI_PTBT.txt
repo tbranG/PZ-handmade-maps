@@ -1,0 +1,10 @@
+IGUI_PTBR = {
+    IGUI_isInsideF = "Não faço ideia de onde estou. Preciso dar uma olhada lá fora",
+    IGUI_isInsideS = "Não dá pra fazer isso dentro de casa. Preciso ver o que tem ao redor",
+
+    IGUI_unknownRegionF = "Não tenho a menor ideia de onde estou",
+    IGUI_unknownRegionS = "Não conheço esse lugar",
+
+    IGUI_failedGuessF = "Hmmm... talvez seja por aqui?",
+    IGUI_failedGuessS = "Talvez nessa área...",
+}

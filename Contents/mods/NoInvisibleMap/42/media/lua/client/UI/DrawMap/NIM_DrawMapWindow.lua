@@ -34,10 +34,10 @@ function NIM_DrawMapWindow:prerender()
     self:drawRectBorder(sketchBorderX, sketchBorderY, sketchBorderWidth, sketchBorderHeight, 1, 0.7, 0.7, 0.7)
     self:drawRectBorder(sketchBorderX + 495, sketchBorderY, sketchBorderWidth / 3, sketchBorderHeight / 2.2, 1, 0.7, 0.7, 0.7)
     
-    self:drawText(getText("UI_DrawMapColorSelect"), 560, 45, 1,1,1,1, UIFont.Small)
-    self:drawText(getText("UI_DrawMapAltitude"), 560, 230, 1,1,1,1, UIFont.Small)
-    -- self:drawText(getText("UI_DrawMapTipTitle"), 580, 230, 1,1,1,1, UIFont.Small)
-    -- self:drawText(getText("UI_DrawMapTipDesc"), 545, 250, 1,1,1,1, UIFont.Small)
+    local colorSelectTitleWidth = getTextManager():MeasureStringX(UIFont.Small, getText("UI_DrawMapColorSelect"))
+    local altitudeTitleWidth = getTextManager():MeasureStringX(UIFont.Small, getText("UI_DrawMapAltitude"))
+    self:drawText(getText("UI_DrawMapColorSelect"), 588 - (colorSelectTitleWidth/2), 45, 1,1,1,1, UIFont.Small)
+    self:drawText(getText("UI_DrawMapAltitude"), 588 - (altitudeTitleWidth/2), 230, 1,1,1,1, UIFont.Small)
 
     self:drawRectBorder(sketchBorderX + 495, sketchBorderY + 183, sketchBorderWidth / 3, sketchBorderHeight / 1.9, 1, 0.7, 0.7, 0.7)
 
@@ -221,7 +221,7 @@ function NIM_DrawMapWindow:create()
     self.altitude:instantiate();
     self:addChild(self.altitude);
 
-    self.finish = ISButton:new((self:getWidth() / 2) - 100, self:getHeight() - 25, 100, 20, "Finish", self, NIM_DrawMapWindow.onOptionMouseDown);
+    self.finish = ISButton:new((self:getWidth() / 2) - 100, self:getHeight() - 25, 100, 20, getText("UI_DrawMapFinish"), self, NIM_DrawMapWindow.onOptionMouseDown);
     self.finish.internal = "FINISH";
     self.finish:initialise();
     self.finish:instantiate();
@@ -229,7 +229,7 @@ function NIM_DrawMapWindow:create()
     self.finish.enable = false;
     self:addChild(self.finish);
 
-    self.cancel = ISButton:new((self:getWidth() / 2) + 5, self:getHeight() - 25, 100, 20, getText("UI_Cancel"), self, NIM_DrawMapWindow.onOptionMouseDown);
+    self.cancel = ISButton:new((self:getWidth() / 2) + 5, self:getHeight() - 25, 100, 20, getText("UI_DrawMapCancel"), self, NIM_DrawMapWindow.onOptionMouseDown);
     self.cancel.internal = "CANCEL";
     self.cancel:initialise();
     self.cancel:instantiate();
