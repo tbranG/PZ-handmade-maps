@@ -78,9 +78,13 @@ function NIM_TransferRegionWindow:prerender()
     self:drawText(titleText, self.width/2 - (getTextManager():MeasureStringX(UIFont.Small, titleText) / 2), 10, 1,1,1,1, UIFont.Small)
     self:drawRectBorder(0, 30, self.width, WINDOW_HEIGHT-30, 1, 0.4, 0.4, 0.4)
 
-    self.itemsPanel:drawText(getText("UI_TransferRegionPencilsTooltip"), 20, 40, 1,1,1,1, UIFont.Medium)
-    self.itemsPanel:drawRectBorder(0, 0, self.itemsPanel:getWidth() / 4.6, self.itemsPanel:getHeight(), 0.3, 1, 1, 1)
-    self:drawRectBorder(195, 53, 1, 70, 0.3, 1, 1, 1)
+    self.itemsPanel:drawText(getText("UI_TransferRegionPencilsTooltip"), 15, 40, 1,1,1,1, UIFont.Medium)
+    
+    -- tooltip and icons divider
+    self.itemsPanel:drawRectBorder(0, 0, self.itemsPanel:getWidth() / 4.5, self.itemsPanel:getHeight(), 0.3, 1, 1, 1)
+    
+    -- multicolor icon and other colors icons divider
+    self:drawRectBorder(197, 53, 1, 70, 0.15, 1, 1, 1)
 
     -- ======================= displaying pencil icons =======================
     if self.multicolorItemRef ~= nil then
@@ -200,7 +204,7 @@ function NIM_TransferRegionWindow:render()
             (paperTextureX - 100) + (paperTextureWidth / 2), 
             (paperTextureY - 10) + (paperTextureHeight / 2), 
             1, 1, 1, 1, 
-            UIFont.Medium
+            UIFont.Small
         )
         return
     end
@@ -224,10 +228,10 @@ function NIM_TransferRegionWindow:render()
 
         self:drawText(
             getText("UI_TransferRegionMissingPencils"),
-            (paperTextureX - 100) + (paperTextureWidth / 2) - 25, 
+            (paperTextureX - 100) + (paperTextureWidth / 2) - 10, 
             (paperTextureY - 10) + (paperTextureHeight / 2), 
             1, 1, 1, 1, 
-            UIFont.Medium
+            UIFont.Small
         )
         return
     end

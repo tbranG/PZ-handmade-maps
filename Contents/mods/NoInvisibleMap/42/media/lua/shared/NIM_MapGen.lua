@@ -58,8 +58,6 @@ end
 -- This function it's used when you add a loot map to your world map
 function NIM_AddRegion(worldMap, inputItem)
     local mapData = worldMap:getModData()
-    local sketch = inputItem
-
     local mapRegions = mapData.mapRegions
 
     local _minX = 0
@@ -67,7 +65,7 @@ function NIM_AddRegion(worldMap, inputItem)
     local _maxX = 0
     local _maxY = 0
 
-    local mapUI = ISMap:new(0, 0, 0, 0, sketch, 0)
+    local mapUI = ISMap:new(0, 0, 0, 0, inputItem, 0)
     local javaObject = UIWorldMap.new(mapUI)
     local mapAPI = javaObject:getAPIv1()
 
@@ -75,11 +73,11 @@ function NIM_AddRegion(worldMap, inputItem)
     mapUI.javaObject = javaObject
 
     LootMaps.callLua("Init", mapUI)
-    
-    local symbolsAPI = WorldMapSymbolsV2.new(javaObject, sketch:getSymbols())
 
-    if sketch:getMapID() == "CustomMap" then
-        local sketchData = sketch:getModData().custoMapData
+    local symbolsAPI = WorldMapSymbolsV2.new(javaObject, inputItem:getSymbols())
+
+    if inputItem:getMapID() == "CustomMap" then
+        local sketchData = inputItem:getModData().custoMapData
         _minX = sketchData._minX
         _minY = sketchData._minY
         _maxX = sketchData._maxX
@@ -91,70 +89,72 @@ function NIM_AddRegion(worldMap, inputItem)
         _maxY = mapUI.mapAPI:getMaxYInSquares()
     end
     
-    local n = symbolsAPI:getSymbolCount()
+    if symbolsAPI ~= nil then 
+        local n = symbolsAPI:getSymbolCount()
+        
+        for i=0, n - 1 do
+            mapData.haveNewSymbols = true
     
-    for i=0, n - 1 do
-        mapData.haveNewSymbols = true
-
-        local symbol = symbolsAPI:getSymbolByIndex(i)
-
-        if symbol:isText() then
-            local mapNotes = mapData.notes
-
-            if mapNotes == nil then
-                local data = {}
-                table.insert(data, {
-                    text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
-                    x = symbol:getWorldX(),
-                    y = symbol:getWorldY(),
-                    r = symbol:getRed(),
-                    g = symbol:getGreen(),
-                    b = symbol:getBlue(),
-                    scale = symbol:getScale(),
-                    rotation = symbol:getRotation()
-                })
-
-                mapData.notes = data
+            local symbol = symbolsAPI:getSymbolByIndex(i)
+    
+            if symbol:isText() then
+                local mapNotes = mapData.notes
+    
+                if mapNotes == nil then
+                    local data = {}
+                    table.insert(data, {
+                        text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
+                        x = symbol:getWorldX(),
+                        y = symbol:getWorldY(),
+                        r = symbol:getRed(),
+                        g = symbol:getGreen(),
+                        b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+                    })
+    
+                    mapData.notes = data
+                else
+                    table.insert(mapNotes, {
+                        text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
+                        x = symbol:getWorldX(),
+                        y = symbol:getWorldY(),
+                        r = symbol:getRed(),
+                        g = symbol:getGreen(),
+                        b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+                    })
+                end
             else
-                table.insert(mapNotes, {
-                    text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
-                    x = symbol:getWorldX(),
-                    y = symbol:getWorldY(),
-                    r = symbol:getRed(),
-                    g = symbol:getGreen(),
-                    b = symbol:getBlue(),
-                    scale = symbol:getScale(),
-                    rotation = symbol:getRotation()
-                })
-            end
-        else
-            local mapSymbols = mapData.symbols
-
-            if mapSymbols == nil then
-                local data = {}
-                table.insert(data, {
-                    symbol = symbol:getSymbolID(),
-                    x = symbol:getWorldX(),
-                    y = symbol:getWorldY(),
-                    r = symbol:getRed(),
-                    g = symbol:getGreen(),
-                    b = symbol:getBlue(),
-                    scale = symbol:getScale(),
-                    rotation = symbol:getRotation()
-                })
-
-                mapData.symbols = data
-            else
-                table.insert(mapSymbols, {
-                    symbol = symbol:getSymbolID(),
-                    x = symbol:getWorldX(),
-                    y = symbol:getWorldY(),
-                    r = symbol:getRed(),
-                    g = symbol:getGreen(),
-                    b = symbol:getBlue(),
-                    scale = symbol:getScale(),
-                    rotation = symbol:getRotation()
-                })
+                local mapSymbols = mapData.symbols
+    
+                if mapSymbols == nil then
+                    local data = {}
+                    table.insert(data, {
+                        symbol = symbol:getSymbolID(),
+                        x = symbol:getWorldX(),
+                        y = symbol:getWorldY(),
+                        r = symbol:getRed(),
+                        g = symbol:getGreen(),
+                        b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+                    })
+    
+                    mapData.symbols = data
+                else
+                    table.insert(mapSymbols, {
+                        symbol = symbol:getSymbolID(),
+                        x = symbol:getWorldX(),
+                        y = symbol:getWorldY(),
+                        r = symbol:getRed(),
+                        g = symbol:getGreen(),
+                        b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+                    })
+                end
             end
         end
     end

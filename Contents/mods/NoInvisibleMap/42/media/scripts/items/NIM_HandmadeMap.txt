@@ -4,8 +4,7 @@ module Base
     {
         DisplayName = Sketch: Surroundings,
 		DisplayCategory = Cartography,
-		ItemType = base:map,
-		Type = Map,
+		ItemType = Map,
 		Weight = 0.2,
 		Icon = Paperwork_Graph_Crumpled,
 		StaticModel = Schematic,
@@ -17,8 +16,7 @@ module Base
 	{
 		DisplayName = Handmade map: Knox Country,
 		DisplayCategory = Cartography,
-		ItemType = base:map,
-		Type = Normal,
+		ItemType = Normal,
 		Weight = 0.5,
 		Icon = Map,
 		StaticModel = MapInHand,
