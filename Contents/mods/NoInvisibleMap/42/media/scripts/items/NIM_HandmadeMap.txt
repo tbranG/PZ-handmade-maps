@@ -4,6 +4,7 @@ module Base
     {
         DisplayName = Sketch: Surroundings,
 		DisplayCategory = Cartography,
+		ItemType = base:map,
 		Type = Map,
 		Weight = 0.2,
 		Icon = Paperwork_Graph_Crumpled,
@@ -16,6 +17,7 @@ module Base
 	{
 		DisplayName = Handmade map: Knox Country,
 		DisplayCategory = Cartography,
+		ItemType = base:map,
 		Type = Normal,
 		Weight = 0.5,
 		Icon = Map,

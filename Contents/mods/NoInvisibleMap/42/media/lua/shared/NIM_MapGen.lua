@@ -2,8 +2,6 @@
 function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor) 
     if sketch ~= nil then
         if sketch:getMapID() == "CustomMap" then
-            local modData = sketch:getModData()
-
             --defualt values
             local minX = playerCell:getMinX() - 96
             local minY = playerCell:getMinY() - 60
@@ -32,8 +30,26 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
                 _maxY = maxY
             }
 
+            local modData = sketch:getModData()
+
             modData.custoMapData = boxTable
             modData.mapColor = pencilColor
+
+            -- ensure the map has a unique id for synchronization
+            if modData.id == nil then
+                modData.id = NIM_MapIdGenerator()
+            end
+
+            if isClient() and not isServer() then
+                sendClientCommand(
+                    getPlayer(),
+                    "NIM",
+                    "SyncMap",
+                    { id = modData.id, modData = modData }
+                )
+            elseif isServer() then
+                sketch:transmitModData()
+            end
         end
     end
 end
@@ -162,6 +178,21 @@ function NIM_AddRegion(worldMap, inputItem)
     end
 
     mapData.haveNewRegions = true
+
+    if isClient() and not isServer() then
+        if mapData.id == nil then
+            mapData.id = NIM_MapIdGenerator()
+        end
+
+        sendClientCommand(
+            getPlayer(),
+            "NIM",
+            "SyncMap",
+            { id = mapData.id, modData = mapData }
+        )
+    elseif isServer() then
+        worldMap:transmitModData()
+    end
 
     local playerObj = getPlayer()
 

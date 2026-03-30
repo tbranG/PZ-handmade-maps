@@ -44,6 +44,21 @@ local TILE_SIZE = 50
         if not isRegionAlreadyOnMap then
             table.insert(mapModData.mapRegions, v)
             mapModData.haveNewRegions = true
+        
+            if mapModData.id == nil then
+                mapModData.id = NIM_MapIdGenerator()
+            end
+
+            if isClient() and not isServer() then
+                sendClientCommand(
+                    getPlayer(),
+                    "NIM",
+                    "SyncMap",
+                    { id = mapModData.id, modData = mapModData }
+                )
+            elseif isServer() then
+                item:transmitModData()
+            end
         end
     end
 

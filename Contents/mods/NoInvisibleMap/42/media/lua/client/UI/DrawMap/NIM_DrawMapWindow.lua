@@ -383,14 +383,19 @@ function NIM_DrawMapWindow:onOptionMouseDown(button, x, y)
         local player = getPlayer()
         local playerInventory = player:getInventory()
 
-        playerInventory:AddItem("Base.AreaSketch")
+        if isClient() and not isServer() then 
+            sendClientCommand(
+                getPlayer(),
+                "NIM",
+                "CreateSketch",
+                {}
+            )
+        else
+            playerInventory:AddItem("Base.AreaSketch")    
+            playerInventory:RemoveOneOf("Base.SheetPaper2")
+        end
         
         local sketch = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.AreaSketch" end)
-        -- local paper = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.SheetPaper2" end)
-
-        -- playerInventory:Remove(paper)
-        playerInventory:RemoveOneOf("Base.SheetPaper2")
-
         local playerCell = player:getCell()
 
         local zIndex = player:getZ()
@@ -410,7 +415,6 @@ function NIM_DrawMapWindow:onOptionMouseDown(button, x, y)
         end
 
         NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
-        
 
         self:setVisible(false);
         self:removeFromUIManager();
