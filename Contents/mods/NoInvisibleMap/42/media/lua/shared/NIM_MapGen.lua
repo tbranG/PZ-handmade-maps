@@ -74,7 +74,12 @@ function NIM_AddRegion(worldMap, inputItem)
 
     LootMaps.callLua("Init", mapUI)
 
-    local symbolsAPI = WorldMapSymbolsV2.new(javaObject, inputItem:getSymbols())
+    -- from now on i will use the object modData to store each symbol,
+    -- that's because for some reason TIS decided to hide getSymbols() method.
+    -- ugly ass hack
+    local modData = inputItem:getModData()
+    local itemSymbols = modData.symbols
+    local itemNotes = modData.notes
 
     if inputItem:getMapID() == "CustomMap" then
         local sketchData = inputItem:getModData().custoMapData
@@ -88,73 +93,71 @@ function NIM_AddRegion(worldMap, inputItem)
         _maxX = mapUI.mapAPI:getMaxXInSquares()
         _maxY = mapUI.mapAPI:getMaxYInSquares()
     end
+
+    mapData.haveNewSymbols = itemSymbols ~= nil or itemNotes ~= nil
+
+    if itemSymbols ~= nil then
+        for _, v in pairs(itemSymbols) do
+            local mapSymbols = mapData.symbols
     
-    if symbolsAPI ~= nil then 
-        local n = symbolsAPI:getSymbolCount()
-        
-        for i=0, n - 1 do
-            mapData.haveNewSymbols = true
-    
-            local symbol = symbolsAPI:getSymbolByIndex(i)
-    
-            if symbol:isText() then
-                local mapNotes = mapData.notes
-    
-                if mapNotes == nil then
-                    local data = {}
-                    table.insert(data, {
-                        text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
-                        x = symbol:getWorldX(),
-                        y = symbol:getWorldY(),
-                        r = symbol:getRed(),
-                        g = symbol:getGreen(),
-                        b = symbol:getBlue(),
-                        scale = symbol:getScale(),
-                        rotation = symbol:getRotation()
-                    })
-    
-                    mapData.notes = data
-                else
-                    table.insert(mapNotes, {
-                        text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
-                        x = symbol:getWorldX(),
-                        y = symbol:getWorldY(),
-                        r = symbol:getRed(),
-                        g = symbol:getGreen(),
-                        b = symbol:getBlue(),
-                        scale = symbol:getScale(),
-                        rotation = symbol:getRotation()
-                    })
-                end
+            if mapSymbols == nil then
+                local data = {}
+                table.insert(data, {
+                    symbol = v.symbol,
+                    x = v.x,
+                    y = v.y,
+                    r = v.r,
+                    g = v.g,
+                    b = v.b,
+                    scale = v.scale,
+                    rotation = v.rotation
+                })
+
+                mapData.symbols = data
             else
-                local mapSymbols = mapData.symbols
+                table.insert(mapSymbols, {
+                    symbol = v.symbol,
+                    x = v.x,
+                    y = v.y,
+                    r = v.r,
+                    g = v.g,
+                    b = v.b,
+                    scale = v.scale,
+                    rotation = v.rotation
+                })
+            end
+        end
+    end
+		
+    if itemNotes ~= nil then
+        for _, v in pairs(itemNotes) do
+            local mapNotes = mapData.notes
     
-                if mapSymbols == nil then
-                    local data = {}
-                    table.insert(data, {
-                        symbol = symbol:getSymbolID(),
-                        x = symbol:getWorldX(),
-                        y = symbol:getWorldY(),
-                        r = symbol:getRed(),
-                        g = symbol:getGreen(),
-                        b = symbol:getBlue(),
-                        scale = symbol:getScale(),
-                        rotation = symbol:getRotation()
-                    })
-    
-                    mapData.symbols = data
-                else
-                    table.insert(mapSymbols, {
-                        symbol = symbol:getSymbolID(),
-                        x = symbol:getWorldX(),
-                        y = symbol:getWorldY(),
-                        r = symbol:getRed(),
-                        g = symbol:getGreen(),
-                        b = symbol:getBlue(),
-                        scale = symbol:getScale(),
-                        rotation = symbol:getRotation()
-                    })
-                end
+            if mapNotes == nil then
+                local data = {}
+                table.insert(data, {
+                    text = v.text,
+                    x = v.x,
+                    y = v.y,
+                    r = v.r,
+                    g = v.g,
+                    b = v.b,
+                    scale = v.scale,
+                    rotation = v.rotation
+                })
+
+                mapData.notes = data
+            else
+                table.insert(mapNotes, {
+                    text = v.text,
+                    x = v.x,
+                    y = v.y,
+                    r = v.r,
+                    g = v.g,
+                    b = v.b,
+                    scale = v.scale,
+                    rotation = v.rotation
+                })
             end
         end
     end

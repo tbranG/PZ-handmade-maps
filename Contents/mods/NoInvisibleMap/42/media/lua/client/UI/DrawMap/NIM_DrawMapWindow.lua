@@ -1,3 +1,5 @@
+require "TimedActions/SketchDrawingAction" 
+
 NIM_DrawMapWindow = ISPanel:derive("NIM_DrawMapWindow");
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
@@ -383,6 +385,8 @@ function NIM_DrawMapWindow:onOptionMouseDown(button, x, y)
         local player = getPlayer()
         local playerInventory = player:getInventory()
 
+        local sketch = nil
+
         if isClient() and not isServer() then 
             sendClientCommand(
                 getPlayer(),
@@ -391,11 +395,11 @@ function NIM_DrawMapWindow:onOptionMouseDown(button, x, y)
                 {}
             )
         else
-            playerInventory:AddItem("Base.AreaSketch")    
+            sketch = playerInventory:AddItem("Base.AreaSketch")    
             playerInventory:RemoveOneOf("Base.SheetPaper2")
         end
         
-        local sketch = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.AreaSketch" end)
+        --local sketch = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.AreaSketch" end)
         local playerCell = player:getCell()
 
         local zIndex = player:getZ()
@@ -419,6 +423,8 @@ function NIM_DrawMapWindow:onOptionMouseDown(button, x, y)
         self:setVisible(false);
         self:removeFromUIManager();
         self:close()
+
+        ISTimedActionQueue.add(SketchDrawingAction:new(player, 90, sketch))
     end
     if button.internal == "CANCEL" or button.internal == "EXIT" then
         self:setVisible(false);
@@ -502,7 +508,7 @@ function NIM_DrawMapWindow:onTick()
                     window.pixelMatrix[i].colored = true
 
                     window.coloredPixels = window.coloredPixels + 1
-                    window.character:playSound("Painting")
+                    window.character:playSoundLocal("Painting")
                 end
             end
         end
