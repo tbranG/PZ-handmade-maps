@@ -414,6 +414,20 @@ function NIM_ISWorldMapOverrides()
         self.mapAPI:setBoolean("BlurUnvisited", false)
     end
 
+    -- nim override
+    -- we also need to wipe the map modData
+    function ISWorldMap:onConfirmForget(button)
+        self.forgetUI = nil
+        if button.internal ~= "YES" then return end
+        self.mapAPI:getSymbolsAPI():clearUserAnnotations()
+        WorldMapVisited.getInstance():forget()
+        local data = self:getModData()
+        for k, v in pairs(data) do
+            data[k] = nil
+        end
+        sendClientCommand(getPlayer(), "map", "forget", {});
+    end
+
     -- function override
     -- adding NIM_AddMapData call
     function ISWorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
@@ -477,10 +491,7 @@ function NIM_ISWorldMapOverrides()
             local mapUI = ISWorldMap_instance
             local mapAPI = mapUI.javaObject:getAPIv1()
 
-            --new background color
-            local r,g,b = 127/255, 118/255, 108/255
-            mapAPI:setUnvisitedRGBA(r * 0.9, g * 0.9, b *0.9, 1.0)
-            mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0.1) 
+            mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0) 
 
             return
         end
@@ -506,10 +517,7 @@ function NIM_ISWorldMapOverrides()
         local mapUI = ISWorldMap_instance
         local mapAPI = mapUI.javaObject:getAPIv1()
 
-        --new background color
-        local r,g,b = 127/255, 118/255, 108/255
-        mapAPI:setUnvisitedRGBA(r * 0.9, g * 0.9, b *0.9, 1.0)
-        mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0.1) 
+        mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0)
 
         if MainScreen.instance.inGame then
             for i=1,getNumActivePlayers() do

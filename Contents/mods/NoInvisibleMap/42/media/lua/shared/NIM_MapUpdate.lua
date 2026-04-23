@@ -22,6 +22,7 @@ end
 
 -- ###############################################################################
 
+-- Add a visited region to player's modData
 function NIM_CreateMemoryRegion(playerObj, playerModData)
     local bminX = playerObj:getX() - 48
     local bminY = playerObj:getY() - 48
@@ -62,8 +63,6 @@ function NIM_CreateMemoryRegion(playerObj, playerModData)
             v.maxY = NIM_GetGreater(newBox.maxY, v.maxY)
             return
         end
-
-        --Border distance check
     end 
 
     table.insert(playerModData.visitedRegions, newBox)
@@ -115,12 +114,12 @@ function NIM_OnTickMapUpdate()
         maxX,
         maxY
     )
-    worldMapVisitedInstance:clearVisitedInSquares(
-        minX,
-        minY,
-        maxX,
-        maxY
-    )
+    -- worldMapVisitedInstance:clearVisitedInSquares(
+    --     minX,
+    --     minY,
+    --     maxX,
+    --     maxY
+    -- )
 end
 
 Events.OnPlayerUpdate.Add(NIM_OnTickMapUpdate);
