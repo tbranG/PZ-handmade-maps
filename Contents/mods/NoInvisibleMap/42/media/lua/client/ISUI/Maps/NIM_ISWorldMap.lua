@@ -421,10 +421,14 @@ function NIM_ISWorldMapOverrides()
         if button.internal ~= "YES" then return end
         self.mapAPI:getSymbolsAPI():clearUserAnnotations()
         WorldMapVisited.getInstance():forget()
+
         local data = self:getModData()
-        for k, v in pairs(data) do
-            data[k] = nil
+        if data ~= nil then
+            for k, v in pairs(data) do
+                data[k] = nil
+            end
         end
+        
         sendClientCommand(getPlayer(), "map", "forget", {});
     end
 
