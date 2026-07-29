@@ -114,12 +114,12 @@ function NIM_OnTickMapUpdate()
         maxX,
         maxY
     )
-    -- worldMapVisitedInstance:clearVisitedInSquares(
-    --     minX,
-    --     minY,
-    --     maxX,
-    --     maxY
-    -- )
+    worldMapVisitedInstance:clearVisitedInSquares(
+        minX,
+        minY,
+        maxX,
+        maxY
+    )
 end
 
 Events.OnPlayerUpdate.Add(NIM_OnTickMapUpdate);

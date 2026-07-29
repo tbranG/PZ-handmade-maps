@@ -422,13 +422,14 @@ function NIM_ISWorldMapOverrides()
         self.mapAPI:getSymbolsAPI():clearUserAnnotations()
         WorldMapVisited.getInstance():forget()
 
-        local data = self:getModData()
+        local map = getPlayer():getInventory():getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
+        local data = map:getModData()
         if data ~= nil then
             for k, v in pairs(data) do
                 data[k] = nil
             end
         end
-        
+
         sendClientCommand(getPlayer(), "map", "forget", {});
     end
 
