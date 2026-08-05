@@ -1,0 +1,39 @@
+VERSION = 1,
+
+option NIM_disable_minigames
+{
+    type = boolean,
+    default = false,
+    page = HandmadeMaps,
+    translation = NIM_Disable_Minigames,
+}
+
+option NIM_lvl_one_area 
+{
+    type = double,
+    min = 0.0,
+    max = 5.0,
+    default = 1.5,
+    page = HandmadeMaps,
+    translation = NIM_LVL_One_Area,
+}
+
+option NIM_lvl_two_area 
+{
+    type = double,
+    min = 0.0,
+    max = 5.0,
+    default = 2.0,
+    page = HandmadeMaps,
+    translation = NIM_LVL_Two_Area,
+}
+
+option NIM_lvl_three_area 
+{
+    type = double,
+    min = 0.0,
+    max = 5.0,
+    default = 2.5,
+    page = HandmadeMaps,
+    translation = NIM_LVL_Three_Area,
+}

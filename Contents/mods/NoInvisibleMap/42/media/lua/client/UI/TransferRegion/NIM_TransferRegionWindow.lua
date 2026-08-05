@@ -254,6 +254,18 @@ function NIM_TransferRegionWindow:render()
             end
         end
 
+        --white overlay
+        self:drawRect(
+            paperTextureX, 
+            paperTextureY, 
+            paperTextureWidth, 
+            paperTextureHeight,
+            0.25,
+            1,
+            1,
+            1
+        )
+
         -- Pencil aim
         local aimWidth, aimHeight = 50, 50
         self:drawRectBorder(self:getMouseX() - (aimWidth / 2), self:getMouseY() - (aimHeight / 2), aimWidth, aimHeight, 1, 0.3, 0.3, 0.3)
@@ -661,6 +673,18 @@ function NIM_TransferRegionWindow:onOptionMouseDown(button, x, y)
         self:close()
     end
     if button.internal == "DRAW" then
+        local isMinigamesDisabled = NIM.Config.disable_minigames
+
+        if isMinigamesDisabled then
+            NIM_TransferRegions(self.sourceItem)
+
+            self:setVisible(false);
+            self:removeFromUIManager();
+            self:close()
+
+            return
+        end
+
         for i = 1, #self.mapInputs do
             self.mapInputs[i].backgroundColor = {r=0, g=0, b=0, a=0}
         end

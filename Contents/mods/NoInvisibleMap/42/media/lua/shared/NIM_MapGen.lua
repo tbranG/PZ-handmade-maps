@@ -17,10 +17,17 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
             end
 
             if zIndex > 0 then
-                minX = math.ceil(minX - ((zIndex ^ 1.5) * 72))
-                minY = math.ceil(minY - ((zIndex ^ 1.5) * 56))
-                maxX = math.ceil(maxX + ((zIndex ^ 1.5) * 72))
-                maxY = math.ceil(maxY + ((zIndex ^ 1.5) * 56))
+                local viewOffset = NIM.Config.lvl_one_area
+                if viewOffset == 2 then 
+                    viewOffset = NIM.Config.lvl_two_area 
+                else
+                    viewOffset = NIM.Config.lvl_three_area
+                end 
+
+                minX = math.ceil(minX - ((zIndex ^ viewOffset) * 72))
+                minY = math.ceil(minY - ((zIndex ^ viewOffset) * 56))
+                maxX = math.ceil(maxX + ((zIndex ^ viewOffset) * 72))
+                maxY = math.ceil(maxY + ((zIndex ^ viewOffset) * 56))
             end
 
             local boxTable = {

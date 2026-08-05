@@ -1,9 +1,10 @@
+require "ISUI/Gamepad/JoyPadSetup"
 require "PZAPI/ui/atoms/Text"
 require "PZAPI/ui/molecules/TextButton"
 require "PZAPI/ui/organisms/Window"
 require "PZAPI/ui/molecules/ScrollBarVertical"
 
--- Handmade maps override v2.5
+-- Handmade maps override v3.3
 -- Changes
 --[[
     Flyers no longer reveal a new area in the map. Instead they will put a question mark in the world map
@@ -44,6 +45,8 @@ local revealOnMapTemplate = UI.Panel{
     onLeftClick = function(self) end
 }
 
+local worldMapFlier = false
+
 UI.PrintMedia = UI.Window{
     width = 790, height = 824,
     isPin = false,
@@ -60,6 +63,15 @@ UI.PrintMedia = UI.Window{
                         self:setY(self.y + dy)
                     end,
                     init = function(self)
+                        if ISWorldMap.instance then
+                            if worldMapFlier == false then
+                                worldMapFlier = true
+                            end
+                        else
+                            if worldMapFlier == true then
+                                worldMapFlier = false
+                            end
+                        end
                         if self.parent.parent.data then
                             local elements = string.split(self.parent.parent.data, "<")
                             for i, val in ipairs(elements) do
@@ -351,6 +363,8 @@ UI.PrintMedia = UI.Window{
 
                     local centerX = xx / (#locationData * 2)
                     local centerY = yy / (#locationData * 2)
+                    local playerObj = getPlayer() -- FIXME: splitscreen
+                    playerObj:setJoypadIgnoreAimUntilCentered(true)
                     
                     local map = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
 
@@ -415,6 +429,25 @@ UI.PrintMedia = UI.Window{
             if revealButton.javaObj:isVisible() then
                 revealButton:onLeftClick()
                 break
+            end
+        end
+    end,
+    renderUpdate = function(self)
+        if tonumber(self.delayResizeW) and tonumber(self.delayResizeH) then
+            self:setWidth(self.delayResizeW)
+            self:setHeight(self.delayResizeH)
+            self.delayResizeW = nil
+            self.delayResizeH = nil
+        end
+        if tonumber(self.leftDragX) and tonumber(self.leftDragY) then
+            self:setX(self.leftDragX)
+            self:setY(self.leftDragY)
+            self.leftDragX = nil
+            self.leftDragY = nil
+        end
+        if ISWorldMap.instance then
+            if worldMapFlier == false then
+                UIManager.RemoveElement(self.javaObj)
             end
         end
     end

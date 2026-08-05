@@ -1,27 +1,3 @@
--- Utils ########################################################################
-
-local function NIM_GetDistance(a, b)
-    return math.sqrt((math.abs(a.x - b.x))^2 + (math.abs(a.y - b.y))^2)
-end
-
-local function NIM_GetGreater(a, b)
-    if a > b then
-        return a
-    else
-        return b
-    end
-end
-
-local function NIM_GetLower(a, b)
-    if a > b then
-        return b
-    else
-        return a
-    end
-end
-
--- ###############################################################################
-
 -- Add a visited region to player's modData
 function NIM_CreateMemoryRegion(playerObj, playerModData)
     local bminX = playerObj:getX() - 48
@@ -56,7 +32,7 @@ function NIM_CreateMemoryRegion(playerObj, playerModData)
             y = math.floor(v.maxY - v.minY)
         }
 
-        if NIM_GetDistance(newBox_central_point, v_central_point) <= 128 then
+        if NIM_GetDistance(newBox_central_point, v_central_point) <= 256 then
             v.minX = NIM_GetLower(newBox.minX, v.minX)
             v.maxX = NIM_GetGreater(newBox.maxX, v.maxX)
             v.minY = NIM_GetLower(newBox.minY, v.minY)

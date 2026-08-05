@@ -1,6 +1,7 @@
 require "ISUI/ISInventoryPaneContextMenu"
 require "UI/DrawMap/NIM_DrawMapWindow"
 require "UI/TransferRegion/NIM_TransferRegionWindow"
+require "TimedActions/SketchDrawingAction" 
 
 NIM_HandmadeMapContext = {}
 
@@ -9,7 +10,40 @@ local function openAddRegionMenu(worldMap)
 end
 
 local function openDrawMenu(playerObj)
-    NIM_DrawMapWindow:open()
+    local isMinigamesDisabled = NIM.Config.disable_minigames
+    
+    if isMinigamesDisabled then
+        local player = getPlayer()
+        local playerInventory = player:getInventory()
+
+        local sketch = nil
+
+        if isClient() and not isServer() then 
+            sendClientCommand(
+                getPlayer(),
+                "NIM",
+                "CreateSketch",
+                {}
+            )
+        else
+            sketch = playerInventory:AddItem("Base.AreaSketch")    
+            playerInventory:RemoveOneOf("Base.SheetPaper2")
+        end
+        
+        local playerCell = player:getCell()
+        local zIndex = player:getZ()
+        local outside = player:isOutside()
+        
+        local playerCanSeeOutside = player:getSquare():isAdjacentToWindow()
+
+        local pencilColor = NIM_GetRandomPenColor()
+
+        NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
+
+        ISTimedActionQueue.add(SketchDrawingAction:new(player, 90, sketch))
+    else
+        NIM_DrawMapWindow:open()
+    end
 end
 
 -- ##########################
