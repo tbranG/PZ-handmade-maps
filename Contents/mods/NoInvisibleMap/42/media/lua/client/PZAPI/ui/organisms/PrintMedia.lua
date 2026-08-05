@@ -335,8 +335,8 @@ UI.PrintMedia = UI.Window{
                             modData.pointsOfInterest = data
                         else
                             for _, v in pairs(pointsOfInterest) do
-                                local sameX = newSymbol.x == v.x
-                                local sameY = newSymbol.y == v.y
+                                local sameX = NIM.Utils.Round(newSymbol.x) == NIM.Utils.Round(v.x)
+                                local sameY = NIM.Utils.Round(newSymbol.y) == NIM.Utils.Round(v.y)
 
                                 if sameX and sameY then
                                     isPOInew = false

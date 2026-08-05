@@ -1,8 +1,18 @@
-function NIM_GetDistance(a, b)
+NIM = NIM or {}
+NIM.Utils = {}
+
+--- Calculates the distance between two points
+---@param a table
+---@param b table
+---@return number
+function NIM.Utils.GetDistance(a, b)
     return math.sqrt((math.abs(a.x - b.x))^2 + (math.abs(a.y - b.y))^2)
 end
 
-function NIM_GetGreater(a, b)
+--- Gets the greater value between two numbers
+---@param a number
+---@param b number
+function NIM.Utils.GetGreater(a, b)
     if a > b then
         return a
     else
@@ -10,7 +20,10 @@ function NIM_GetGreater(a, b)
     end
 end
 
-function NIM_GetLower(a, b)
+--- Gets the lowest value between two numbers
+---@param a number
+---@param b number
+function NIM.Utils.GetLower(a, b)
     if a > b then
         return b
     else
@@ -18,7 +31,32 @@ function NIM_GetLower(a, b)
     end
 end
 
-function NIM_GetRandomPenColor()
+--- Rounds a number to it's nearest integer
+---@param num number
+function NIM.Utils.Round(num)
+    return math.floor(num + 0.5)
+end
+
+
+--- Removes a random element from a table
+---@param t table
+---@return any
+function NIM.Utils.RemoveRandomElement(t)
+    if t == nil or #t == 0 then
+        return {}
+    end
+
+    local index = ZombRand(#t) + 1
+    table.remove(t, index)
+    
+    return t
+end
+
+
+--- Gets a random string within the set of available colors 
+---{ "red", "blue", "green", "black"}
+---@return string
+function NIM.Utils.GetRandomPenColor()
     local playerInv = getPlayer():getInventory()
 
     local hasMulticolorItem = function()

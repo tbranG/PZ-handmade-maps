@@ -8,6 +8,14 @@ option NIM_disable_minigames
     translation = NIM_Disable_Minigames,
 }
 
+option NIM_auto_open_map
+{
+    type = boolean,
+    default = true,
+    page = HandmadeMaps,
+    translation = NIM_Auto_Open_Map,
+}
+
 option NIM_lvl_one_area 
 {
     type = double,

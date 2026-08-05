@@ -16,30 +16,34 @@ end
 
 function SketchDrawingAction:perform()
     if self.mapItem then
-        local x = getCore():getScreenWidth() / 6;
-        local y = getCore():getScreenHeight() / 6;
-
-        local playerNum = self.character:getPlayerNum()
-        local ui = ISMap:new(x, y, 1280, 720, self.mapItem, playerNum);
-        ui:initialise();
-        ui:addToUIManager();
-
-        local wrap = ui:wrapInCollapsableWindow(self.mapItem:getName(), false, ISMapWrapper);
-        wrap:setInfo(getText("IGUI_Map_Info"));
-        wrap:setWantKeyEvents(true);
-        ui.wrap = wrap;
-        wrap.mapUI = ui;
-        
-        --self.mapItem:doBuildingStash();
-        wrap:setVisible(true);
-        wrap:addToUIManager();
-        
-        local joypadData = JoypadState.players[playerNum + 1]
-        
-        if joypadData then
-            ui.prevFocus = joypadData.focus
-            joypadData.focus = ui
+        local autoOpen = NIM.Config.auto_open_map
+        if autoOpen then
+            local x = getCore():getScreenWidth() / 6;
+            local y = getCore():getScreenHeight() / 6;
+    
+            local playerNum = self.character:getPlayerNum()
+            local ui = ISMap:new(x, y, 1280, 720, self.mapItem, playerNum);
+            ui:initialise();
+            ui:addToUIManager();
+    
+            local wrap = ui:wrapInCollapsableWindow(self.mapItem:getName(), false, ISMapWrapper);
+            wrap:setInfo(getText("IGUI_Map_Info"));
+            wrap:setWantKeyEvents(true);
+            ui.wrap = wrap;
+            wrap.mapUI = ui;
+            
+            --self.mapItem:doBuildingStash();
+            wrap:setVisible(true);
+            wrap:addToUIManager();
+            
+            local joypadData = JoypadState.players[playerNum + 1]
+            
+            if joypadData then
+                ui.prevFocus = joypadData.focus
+                joypadData.focus = ui
+            end
         end
+
 
         self.character:addReadMap(self.mapItem)
     end

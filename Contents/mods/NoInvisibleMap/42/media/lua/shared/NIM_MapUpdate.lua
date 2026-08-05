@@ -32,11 +32,11 @@ function NIM_CreateMemoryRegion(playerObj, playerModData)
             y = math.floor(v.maxY - v.minY)
         }
 
-        if NIM_GetDistance(newBox_central_point, v_central_point) <= 256 then
-            v.minX = NIM_GetLower(newBox.minX, v.minX)
-            v.maxX = NIM_GetGreater(newBox.maxX, v.maxX)
-            v.minY = NIM_GetLower(newBox.minY, v.minY)
-            v.maxY = NIM_GetGreater(newBox.maxY, v.maxY)
+        if NIM.Utils.GetDistance(newBox_central_point, v_central_point) <= 256 then
+            v.minX = NIM.Utils.GetLower(newBox.minX, v.minX)
+            v.maxX = NIM.Utils.GetGreater(newBox.maxX, v.maxX)
+            v.minY = NIM.Utils.GetLower(newBox.minY, v.minY)
+            v.maxY = NIM.Utils.GetGreater(newBox.maxY, v.maxY)
             return
         end
     end 

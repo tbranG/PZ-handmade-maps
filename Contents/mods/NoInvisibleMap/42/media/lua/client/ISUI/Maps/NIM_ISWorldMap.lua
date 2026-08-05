@@ -45,36 +45,37 @@ function NIM_AddMapData()
 				end
 			end
 		end
-	end
 
-	if playerModData.haveNewPointOfInterest then
-		if playerModData.pointsOfInterest ~= nil then
-			for _, v in pairs(playerModData.pointsOfInterest) do
-				local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
-				textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
-				textureSymbol:setAnchor(0.5, 0.5)
-				textureSymbol:setScale(v.scale)
-
-                if mapData.symbols ~= nil then
-                    table.insert(mapData.symbols, {
-                            symbol = v.symbol,
-                            x = v.x,
-                            y = v.y,
-                            r = v.r,
-                            g = v.g,
-                            b = v.b,
-                            scale = v.scale,
-                            rotation = 0
-                        })
+        if playerModData.haveNewPointOfInterest then
+            if playerModData.pointsOfInterest ~= nil then
+                for _, v in pairs(playerModData.pointsOfInterest) do
+                    local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
+                    textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
+                    textureSymbol:setAnchor(0.5, 0.5)
+                    textureSymbol:setScale(v.scale)
+    
+                    if mapData.symbols ~= nil then
+                        table.insert(mapData.symbols, {
+                                symbol = v.symbol,
+                                x = v.x,
+                                y = v.y,
+                                r = v.r,
+                                g = v.g,
+                                b = v.b,
+                                scale = v.scale,
+                                rotation = 0
+                            })
+                    end
                 end
-			end
-		end
-
-		playerModData.haveNewPointOfInterest = false
-
-        --clear points of interest so it doesn't get added again
-        playerModData.pointsOfInterest = nil
+            end
+    
+            playerModData.haveNewPointOfInterest = false
+    
+            --clear points of interest so it doesn't get added again
+            playerModData.pointsOfInterest = nil
+        end
 	end
+
 end
 
 -- Updates world map custom data (symbols, annotations and points of interest)

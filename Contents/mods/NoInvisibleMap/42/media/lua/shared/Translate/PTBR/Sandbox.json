@@ -1,6 +1,7 @@
 {
     "Sandbox_HandmadeMaps": "Handmade Maps",
     "Sandbox_NIM_Disable_Minigames": "Desativar Minigames",
+    "Sandbox_NIM_Auto_Open_Map": "Abrir o mapa automaticamente ao finalizar o desenho",
     "Sandbox_NIM_LVL_One_Area": "Multiplicador de alcance de visão do segundo andar",
     "Sandbox_NIM_LVL_Two_Area": "Multiplicador de alcance de visão do terceiro andar",
     "Sandbox_NIM_LVL_Three_Area": "Multiplicador de alcance de visão do quarto andar e acima"

@@ -36,10 +36,9 @@ local function openDrawMenu(playerObj)
         
         local playerCanSeeOutside = player:getSquare():isAdjacentToWindow()
 
-        local pencilColor = NIM_GetRandomPenColor()
+        local pencilColor = NIM.Utils.GetRandomPenColor()
 
         NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor)
-
         ISTimedActionQueue.add(SketchDrawingAction:new(player, 90, sketch))
     else
         NIM_DrawMapWindow:open()

@@ -1,4 +1,4 @@
--- Method responsible for pinpointing player position on the world map
+--- Method responsible for pinpointing player position on the world map
 function NIM_GuessPosition()
     local player = getPlayer()
     local playerX = player:getX()
