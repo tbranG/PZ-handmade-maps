@@ -2,7 +2,7 @@
 function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zIndex, pencilColor) 
     if sketch ~= nil then
         if sketch:getMapID() == "CustomMap" then
-            --defualt values
+            --default values
             local minX = playerCell:getMinX() - 96
             local minY = playerCell:getMinY() - 60
             local maxX = playerCell:getMaxX() + 96
@@ -18,6 +18,7 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
 
             if zIndex > 0 then
                 local viewOffset = NIM.Config.lvl_one_area
+                
                 if viewOffset == 2 then 
                     viewOffset = NIM.Config.lvl_two_area 
                 else
@@ -44,7 +45,7 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
 
             -- ensure the map has a unique id for synchronization
             if modData.id == nil then
-                modData.id = NIM_MapIdGenerator()
+                modData.id = NIM.Utils.GenerateMapId()
             end
 
             if isClient() and not isServer() then
@@ -106,32 +107,24 @@ function NIM_AddRegion(worldMap, inputItem)
     if itemSymbols ~= nil then
         for _, v in pairs(itemSymbols) do
             local mapSymbols = mapData.symbols
+            local symbolData = {
+                symbol = v.symbol,
+                x = v.x,
+                y = v.y,
+                r = v.r,
+                g = v.g,
+                b = v.b,
+                scale = v.scale,
+                rotation = v.rotation
+            }
     
             if mapSymbols == nil then
                 local data = {}
-                table.insert(data, {
-                    symbol = v.symbol,
-                    x = v.x,
-                    y = v.y,
-                    r = v.r,
-                    g = v.g,
-                    b = v.b,
-                    scale = v.scale,
-                    rotation = v.rotation
-                })
+                table.insert(data, symbolData)
 
                 mapData.symbols = data
             else
-                table.insert(mapSymbols, {
-                    symbol = v.symbol,
-                    x = v.x,
-                    y = v.y,
-                    r = v.r,
-                    g = v.g,
-                    b = v.b,
-                    scale = v.scale,
-                    rotation = v.rotation
-                })
+                table.insert(mapSymbols, symbolData)
             end
         end
     end
@@ -139,59 +132,48 @@ function NIM_AddRegion(worldMap, inputItem)
     if itemNotes ~= nil then
         for _, v in pairs(itemNotes) do
             local mapNotes = mapData.notes
+            local noteData = {
+                text = v.text,
+                x = v.x,
+                y = v.y,
+                r = v.r,
+                g = v.g,
+                b = v.b,
+                scale = v.scale,
+                rotation = v.rotation
+            }
     
             if mapNotes == nil then
                 local data = {}
-                table.insert(data, {
-                    text = v.text,
-                    x = v.x,
-                    y = v.y,
-                    r = v.r,
-                    g = v.g,
-                    b = v.b,
-                    scale = v.scale,
-                    rotation = v.rotation
-                })
+                table.insert(data, noteData)
 
                 mapData.notes = data
             else
-                table.insert(mapNotes, {
-                    text = v.text,
-                    x = v.x,
-                    y = v.y,
-                    r = v.r,
-                    g = v.g,
-                    b = v.b,
-                    scale = v.scale,
-                    rotation = v.rotation
-                })
+                table.insert(mapNotes, noteData)
             end
         end
     end
 
+    local rectConstraints = {
+        minX = _minX,
+        minY = _minY,
+        maxX = _maxX,
+        maxY = _maxY
+    }
+
     if mapRegions == nil then
         local data = {}
-        table.insert(data, {
-            minX = _minX,
-            minY = _minY,
-            maxX = _maxX,
-            maxY = _maxY
-        })
+        table.insert(data, rectConstraints)
         mapData.mapRegions = data
     else
-        table.insert(mapData.mapRegions, {
-            minX = _minX,
-            minY = _minY,
-            maxX = _maxX,
-            maxY = _maxY
-        })
+        table.insert(mapData.mapRegions, rectConstraints)
     end
 
     mapData.haveNewRegions = true
 
     if isClient() and not isServer() then
         if mapData.id == nil then
-            mapData.id = NIM_MapIdGenerator()
+            mapData.id = NIM.Utils.GenerateMapId()
         end
 
         sendClientCommand(
@@ -216,15 +198,5 @@ function NIM_generateWorldMapId(recipeData, character)
     local output = recipeData:getFirstCreatedItem()
     local modData = output:getModData()
 
-    modData.id = NIM_MapIdGenerator()
-end
-
-function NIM_MapIdGenerator()
-    local chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    local result = ''
-    for i = 1, 32 do
-        local index = ZombRand(62)
-        result = result .. chars:sub(index, index)
-    end
-    return result
+    modData.id = NIM.Utils.GenerateMapId()
 end

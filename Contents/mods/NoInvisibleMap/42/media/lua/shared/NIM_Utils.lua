@@ -52,6 +52,12 @@ function NIM.Utils.RemoveRandomElement(t)
     return t
 end
 
+--- Stringify the cell coordinate for easier comparation
+---@param x number
+---@param y number
+function NIM.Utils.StringifyCellCoordinate(x, y)
+    return tostring(x) .. ":" .. tostring(y)
+end
 
 --- Gets a random string within the set of available colors 
 ---{ "red", "blue", "green", "black"}
@@ -103,4 +109,39 @@ function NIM.Utils.GetRandomPenColor()
     end
 
     return availableColors[ZombRand(#availableColors) + 1]
+end
+
+--- Verifies if given item is a map based on it's category
+---@param category string
+function NIM.Utils.IsMap(category)
+    local possibleCategories = {
+        "Cartography",
+        "Map",
+        "LitC",     --Better Sorting
+    }
+    local isMap = false
+
+    for i = 1, #possibleCategories do
+        if category == possibleCategories[i] then
+            isMap = true
+            break
+        end
+    end
+
+    return isMap
+end
+
+--- Generates a new random map Id
+---@param size number
+function NIM.Utils.GenerateMapId(size)
+    local chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    local result = ''
+
+    local upper = size or 32
+
+    for i = 1, upper do
+        local index = ZombRand(62)
+        result = result .. chars:sub(index, index)
+    end
+    return result
 end

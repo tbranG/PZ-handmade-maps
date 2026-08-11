@@ -46,7 +46,7 @@ local TILE_SIZE = 50
             mapModData.haveNewRegions = true
         
             if mapModData.id == nil then
-                mapModData.id = NIM_MapIdGenerator()
+                mapModData.id = NIM.Utils.GenerateMapId()
             end
 
             if isClient() and not isServer() then
@@ -528,7 +528,7 @@ function NIM_TransferRegionWindow:create()
     self.inputPanel.backgroundColor = {r=0, b=0, g=0, a=0};
     self:addChild(self.inputPanel);
 
-    self.playerMapItems = getPlayer():getInventory():getAllEvalRecurse(function(item) return item:getDisplayCategory() == "Cartography" and item:getFullType() ~= "Base.HandmadeMap" end)
+    self.playerMapItems = getPlayer():getInventory():getAllEvalRecurse(function(item) return NIM.Utils.IsMap(item:getDisplayCategory()) and item:getFullType() ~= "Base.HandmadeMap" end)
     self.mapInputs = {}
 
     --buttons

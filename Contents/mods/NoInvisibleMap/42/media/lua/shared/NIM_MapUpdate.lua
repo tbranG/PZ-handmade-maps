@@ -1,101 +1,189 @@
--- Add a visited region to player's modData
-function NIM_CreateMemoryRegion(playerObj, playerModData)
-    local bminX = playerObj:getX() - 48
-    local bminY = playerObj:getY() - 48
-    local bmaxX = playerObj:getX() + 48
-    local bmaxY = playerObj:getY() + 48
+-- initializes world map custom data (known regions, symbols, annotations and points of interest)
+function NIM_AddMapData()
+	local symbolsApi = NIM_WorldMap_Instance.mapAPI:getSymbolsAPIv2()
 
-    local playerX = playerObj:getX()
-    local playerY = playerObj:getY()
+	local playerModData = getPlayer():getModData()
+	local playerInventory = getPlayer():getInventory()
 
-    local newBox = {
-        minX = bminX,
-        maxX = bmaxX,
-        minY = bminY,
-        maxY = bmaxY
-    }
+	local map = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
+    
+	if map ~= nil then
+		local mapData = map:getModData()
+		
+		if mapData.haveNewSymbols or mapData.haveNewRegions or mapData.id ~= (playerModData.lastReadMap or "") then 
+            WorldMapVisited.getInstance():forget()
+			symbolsApi:clear()
+            
+            if mapData.mapRegions ~= nil then
+                for _, v in pairs(mapData.mapRegions) do
+                    WorldMapVisited.getInstance():setVisitedInSquares(v.minX, v.minY, v.maxX, v.maxY)
+                end
+            end
 
-    if playerModData.visitedRegions == nil or #playerModData.visitedRegions == 0 then
-        playerModData.visitedRegions = { newBox }
-        return
-    end
+            mapData.haveNewRegions = false
 
-    for _, v in pairs(playerModData.visitedRegions) do
-        --Central distance check
-        local newBox_central_point = {
-            x = math.floor(newBox.maxX - newBox.minX),
-            y = math.floor(newBox.maxY - newBox.minY)
-        }
+			if mapData.symbols ~= nil then
+				for _, v in pairs(mapData.symbols) do
+					local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
+					textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
+					textureSymbol:setAnchor(0.5, 0.5)
+					textureSymbol:setScale(v.scale)
+                    textureSymbol:setRotation(v.rotation)
+				end
+			end
+		
+			if mapData.notes ~= nil then
+				for _, v in pairs(mapData.notes) do
+                    local layerID = symbolsApi:getDefaultTextLayerID()
+					local textSymbol = symbolsApi:addUntranslatedText(v.text, layerID, v.x, v.y)
+					textSymbol:setRGBA(v.r, v.g, v.b, 1.0)
+					textSymbol:setAnchor(0.0, 0.0)
+					textSymbol:setScale(v.scale)
+                    textSymbol:setRotation(v.rotation)
+				end
+			end
+		end
 
-        local v_central_point = {
-            x = math.floor(v.maxX - v.minX),
-            y = math.floor(v.maxY - v.minY)
-        }
-
-        if NIM.Utils.GetDistance(newBox_central_point, v_central_point) <= 256 then
-            v.minX = NIM.Utils.GetLower(newBox.minX, v.minX)
-            v.maxX = NIM.Utils.GetGreater(newBox.maxX, v.maxX)
-            v.minY = NIM.Utils.GetLower(newBox.minY, v.minY)
-            v.maxY = NIM.Utils.GetGreater(newBox.maxY, v.maxY)
-            return
+        if playerModData.haveNewPointOfInterest then
+            if playerModData.pointsOfInterest ~= nil then
+                for _, v in pairs(playerModData.pointsOfInterest) do
+                    local textureSymbol = symbolsApi:addTexture(v.symbol, v.x, v.y)
+                    textureSymbol:setRGBA(v.r, v.g, v.b, 1.0)
+                    textureSymbol:setAnchor(0.5, 0.5)
+                    textureSymbol:setScale(v.scale)
+    
+                    if mapData.symbols ~= nil then
+                        table.insert(mapData.symbols, {
+                                symbol = v.symbol,
+                                x = v.x,
+                                y = v.y,
+                                r = v.r,
+                                g = v.g,
+                                b = v.b,
+                                scale = v.scale,
+                                rotation = 0
+                            })
+                    end
+                end
+            end
+    
+            playerModData.haveNewPointOfInterest = false
+    
+            --clear points of interest so it doesn't get added again
+            playerModData.pointsOfInterest = nil
         end
-    end 
+	end
 
+end
+
+-- Updates world map custom data (symbols, annotations and points of interest)
+function NIM_UpdateMapData()
+	local symbolsAPI = NIM_WorldMap_Instance.mapAPI:getSymbolsAPIv2()
+	local playerModData = getPlayer():getModData()
+	local playerInventory = getPlayer():getInventory()
+
+	local map = playerInventory:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
+
+	if map ~= nil then
+		local mapData = map:getModData()
+		mapData.symbols = {}
+		mapData.notes = {}
+
+		local n = symbolsAPI:getSymbolCount()
+		
+		for i=0, n - 1 do
+			local symbol = symbolsAPI:getSymbolByIndex(i)
+
+			if symbol:isText() then
+				local mapNotes = mapData.notes
+
+				if mapNotes == nil then
+					local data = {}
+					table.insert(data, {
+						text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
+						x = symbol:getWorldX(),
+						y = symbol:getWorldY(),
+						r = symbol:getRed(),
+						g = symbol:getGreen(),
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+					})
+
+					mapData.notes = data
+				else
+					table.insert(mapNotes, {
+						text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
+						x = symbol:getWorldX(),
+						y = symbol:getWorldY(),
+						r = symbol:getRed(),
+						g = symbol:getGreen(),
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+					})
+				end
+			else
+				local mapSymbols = mapData.symbols
+
+				if mapSymbols == nil then
+					local data = {}
+					table.insert(data, {
+						symbol = symbol:getSymbolID(),
+						x = symbol:getWorldX(),
+						y = symbol:getWorldY(),
+						r = symbol:getRed(),
+						g = symbol:getGreen(),
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+					})
+
+					mapData.symbols = data
+				else
+					table.insert(mapSymbols, {
+						symbol = symbol:getSymbolID(),
+						x = symbol:getWorldX(),
+						y = symbol:getWorldY(),
+						r = symbol:getRed(),
+						g = symbol:getGreen(),
+						b = symbol:getBlue(),
+                        scale = symbol:getScale(),
+                        rotation = symbol:getRotation()
+					})
+				end
+			end
+		end
+
+		mapData.haveNewSymbols = false
+	end
+
+end
+
+-- Add a visited region to player's modData
+function NIM_CreateMemoryRegion(player)
+    local playerModData = player:getModData()
+
+	if playerModData.known == nil then playerModData.known = {} end
+	if playerModData.visitedRegions == nil then playerModData.visitedRegions = {} end
+	
+    local cellX = math.floor(player:getX() / 256)
+    local cellY = math.floor(player:getY() / 256)
+
+    local strCoord = NIM.Utils.StringifyCellCoordinate(cellX, cellY)
+    local alreadyVisited = playerModData.known[strCoord] ~= nil
+
+    if alreadyVisited then return end
+
+    playerModData.known[strCoord] = true
+    local newBox = {
+        minX = cellX * 256,
+        maxX = (cellX * 256) + 256,
+        minY = cellY * 256,
+        maxY = (cellY * 256) + 256
+    }
+	
     table.insert(playerModData.visitedRegions, newBox)
 end
 
-function NIM_OnTickMapUpdate()
-    local playerObj = getPlayer()
-    local playerModData = playerObj:getModData()
-
-    local worldMapVisitedInstance = WorldMapVisited.getInstance()
-    local minX = playerObj:getX() - 32
-    local minY = playerObj:getY() - 32
-    local maxX = playerObj:getX() + 32
-    local maxY = playerObj:getY() + 32
-
-    if not playerModData.isWorldMapOpen and not Patch_RV_isInside() then
-        NIM_CreateMemoryRegion(playerObj, playerModData)
-    end
-    
-    local topIsKnown = false
-    local bottomIsKnown = false
-    local leftIsKnown = false
-    local rightIsKnown = false
-
-    local border_counter = 0
-
-    if worldMapVisitedInstance:isVisited(playerObj:getX(), playerObj:getY() - 128) then
-        topIsKnown = true
-        border_counter = border_counter + 1
-    end
-    if worldMapVisitedInstance:isVisited(playerObj:getX() + 64, playerObj:getY()) then
-        rightIsKnown = true
-        border_counter = border_counter + 1
-    end
-    if border_counter < 2 and worldMapVisitedInstance:isVisited(playerObj:getX(), playerObj:getY() + 64) then
-        bottomIsKnown = true
-        border_counter = border_counter + 1
-    end
-    if border_counter < 2 and worldMapVisitedInstance:isVisited(playerObj:getX() - 64, playerObj:getY()) then
-        leftIsKnown = true
-        border_counter = border_counter + 1
-    end
-
-    if border_counter >= 2 then return end
-
-    worldMapVisitedInstance:clearKnownInSquares(
-        minX,
-        minY,
-        maxX,
-        maxY
-    )
-    worldMapVisitedInstance:clearVisitedInSquares(
-        minX,
-        minY,
-        maxX,
-        maxY
-    )
-end
-
-Events.OnPlayerUpdate.Add(NIM_OnTickMapUpdate);
+Events.OnPlayerUpdate.Add(NIM_CreateMemoryRegion);
