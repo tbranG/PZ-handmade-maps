@@ -362,10 +362,14 @@ function NIM_WorldMap:prerender()
 		MapUtils.initDefaultStyleV3(self)
 		MapUtils.overlayPaper(self)
 	end
+
 	self:renderPrintMedia()
 	self:renderStashMaps()
 	self:positionStashMap()
 	MapUtils.renderDarkModeOverlay(self)
+	self.mapAPI:setBoolean("BlurUnvisited", false)
+	self.mapAPI:setBoolean("ShowStreetNames", false)
+
 	self:pickMouseOverStreet()
 	if TERRAIN_IMAGE then
 	    self:checkTerrainImage()
@@ -376,15 +380,24 @@ function NIM_WorldMap:prerender()
 end
 
 function NIM_WorldMap:render()
-	getWorld():setDrawWorld(false)
+	--getWorld():setDrawWorld(false)
 
-	local INSET = 0
+	local INSET = 64
 	local w = getCore():getScreenWidth() - INSET * 2
 	local h = getCore():getScreenHeight() - INSET * 2
 	if self.width ~= w or self.height ~= h then
 		self:setWidth(w)
 		self:setHeight(h)
+
 	end
+	
+	if self.x ~= INSET or self.y ~= INSET then
+		self:setX(INSET)
+		self:setY(INSET)
+	end
+
+	self:drawRectBorder(0, 0, self.width - 1, self.height - 1, 1, 0.6, 0.6, 0.6)
+	self:drawRectBorder(1, 1, self.width - 2, self.height - 2, 1, 1, 1, 1)
 
 	self.isometric = self.mapAPI:getBoolean("Isometric")
 	self.keyUI:setIso(self.isometric)

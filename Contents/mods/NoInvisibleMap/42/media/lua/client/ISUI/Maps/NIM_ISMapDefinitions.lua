@@ -1,36 +1,3 @@
--- if ISWorldMap_instance is null, then we will force it's init
-function NIM_InitWorldMap() 
-	local INSET = 0
-	local playerNum = getPlayer():getPlayerNum()
-	ISWorldMap_instance = ISWorldMap:new(INSET, INSET, getCore():getScreenWidth() - INSET * 2, getCore():getScreenHeight() - INSET * 2)
-	ISWorldMap_instance:initialise()
-	ISWorldMap_instance:instantiate()
-	ISWorldMap_instance.character = getSpecificPlayer(playerNum)
-	ISWorldMap_instance.playerNum = playerNum
-	ISWorldMap_instance.symbolsUI.character = getSpecificPlayer(playerNum)
-	ISWorldMap_instance.symbolsUI.playerNum = playerNum
-	ISWorldMap_instance.symbolsUI:checkInventory()
-	ISWorldMap_instance:initDataAndStyle()
-	ISWorldMap_instance:setHideUnvisitedAreas(ISWorldMap_instance.hideUnvisitedAreas)
-	ISWorldMap_instance:setShowPlayers(ISWorldMap_instance.showPlayers)
-	ISWorldMap_instance:setShowRemotePlayers(ISWorldMap_instance.showRemotePlayers)
-	ISWorldMap_instance:setShowPlayerNames(ISWorldMap_instance.showPlayerNames)
-	ISWorldMap_instance:setShowCellGrid(ISWorldMap_instance.showCellGrid)
-	ISWorldMap_instance:setShowTileGrid(ISWorldMap_instance.showTileGrid)
-	ISWorldMap_instance:setIsometric(ISWorldMap_instance.isometric)
-	ISWorldMap_instance.mapAPI:resetView()
-	if ISWorldMap_instance.character then
-		ISWorldMap_instance.mapAPI:centerOn(ISWorldMap_instance.character:getX(), ISWorldMap_instance.character:getY())
-		ISWorldMap_instance.mapAPI:setZoom(18.0)
-	end
-	ISWorldMap_instance:restoreSettings()
-	ISWorldMap_instance:addToUIManager()
-	ISWorldMap_instance.getJoypadFocus = true
-	ISWorldMap_instance.symbolsUI:undisplay()
-	ISWorldMap_instance:setVisible(false)
-	ISWorldMap_instance:removeFromUIManager()
-end
-
 -- custom map definition
 function NIM_InitCustomMap()
     MapUtils = MapUtils or {}
@@ -941,9 +908,11 @@ function NIM_InitCustomMap()
         -- The default changed from false to true when street names were added.
         mapAPI:setBoolean("ImagePyramid", false)
 
-        local r,g,b = 219/255, 215/255, 192/255
+        local r,g,b = 232/255, 224/255, 211/255
+        local ur,ug,ub = 173/255, 156/255, 128/255 
+
         mapAPI:setBackgroundRGBA(r, g, b, 1.0)
-        mapAPI:setUnvisitedRGBA(r * 0.936, g * 0.936, b * 0.936, 0)
+        mapAPI:setUnvisitedRGBA(ur, ug, ub, 0)
         mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0)
 
         styleAPI:clear()
