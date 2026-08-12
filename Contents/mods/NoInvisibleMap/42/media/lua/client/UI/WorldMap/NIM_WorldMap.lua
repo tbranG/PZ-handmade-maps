@@ -305,13 +305,7 @@ function NIM_WorldMap:createChildren()
 
 	local buttons = {}
 
-	self.optionBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, self.onChangeOptions)
-	self.optionBtn:setImage(getTexture("media/ui/inventoryPanes/Button_Settings.png"))
-	self.optionBtn:forceImageSize(self.texViewTerrainImage:getWidth(), self.texViewTerrainImage:getHeight())
-	self.buttonPanel:addChild(self.optionBtn)
-	table.insert(buttons, self.optionBtn)
-
-	self.zoomInButton = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "+", self, self.onZoomInButton)
+	self.zoomInButton = ISButton:new(0, 0, btnSize, btnSize, "+", self, self.onZoomInButton)
 	self.buttonPanel:addChild(self.zoomInButton)
 	table.insert(buttons, self.zoomInButton)
 
@@ -334,15 +328,6 @@ function NIM_WorldMap:createChildren()
 	self.buttonPanel:addChild(self.symbolsBtn)
 	table.insert(buttons, self.symbolsBtn)
 
-	self.printMediaBtn = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "P", self, self.onTogglePrintMedia)
-	self.printMediaBtn:setImage(getTexture("Item_Flier"))
-	self.buttonPanel:addChild(self.printMediaBtn)
-	table.insert(buttons, self.printMediaBtn)
-
-	self.forgetBtn = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, "?", self, function(self, button) self:onForget(button) end)
-	self.buttonPanel:addChild(self.forgetBtn)
-	table.insert(buttons, self.forgetBtn)
-
 	self.closeBtn = ISButton:new(buttons[#buttons]:getRight() + UI_BORDER_SPACING, 0, btnSize, btnSize, getText("UI_btn_close"), self, self.close)
 	self.buttonPanel:addChild(self.closeBtn)
 	table.insert(buttons, self.closeBtn)
@@ -363,9 +348,6 @@ function NIM_WorldMap:prerender()
 		MapUtils.overlayPaper(self)
 	end
 
-	self:renderPrintMedia()
-	self:renderStashMaps()
-	self:positionStashMap()
 	MapUtils.renderDarkModeOverlay(self)
 	self.mapAPI:setBoolean("BlurUnvisited", false)
 	self.mapAPI:setBoolean("ShowStreetNames", false)
@@ -380,9 +362,9 @@ function NIM_WorldMap:prerender()
 end
 
 function NIM_WorldMap:render()
-	--getWorld():setDrawWorld(false)
-
 	local INSET = 64
+	local HEADER_SIZE = 32
+
 	local w = getCore():getScreenWidth() - INSET * 2
 	local h = getCore():getScreenHeight() - INSET * 2
 	if self.width ~= w or self.height ~= h then
@@ -393,11 +375,17 @@ function NIM_WorldMap:render()
 	
 	if self.x ~= INSET or self.y ~= INSET then
 		self:setX(INSET)
-		self:setY(INSET)
+		self:setY(INSET + HEADER_SIZE)
 	end
 
-	self:drawRectBorder(0, 0, self.width - 1, self.height - 1, 1, 0.6, 0.6, 0.6)
-	self:drawRectBorder(1, 1, self.width - 2, self.height - 2, 1, 1, 1, 1)
+	self:drawRect(0, -HEADER_SIZE, self.width, HEADER_SIZE, 0.8, 0, 0, 0)
+	self:drawRectBorder(0, -2, self.width - 3, 1, 0.6, 1, 1, 1)
+
+	self:drawText(getText("UI_WorldMapTitle"), (self.width / 2) - 32,  -(HEADER_SIZE / 2) - 8, 1, 1, 1, 1, UIFont.Small)
+
+	self:drawRectBorder(0, -HEADER_SIZE, self.width - 1, self.height + HEADER_SIZE - 1, 1, 1, 1, 1)
+	self:drawRectBorder(1, -HEADER_SIZE + 1, self.width - 3, self.height + HEADER_SIZE - 3, 1, 0.5, 0.5, 0.5)
+	self:drawRectBorder(2, -HEADER_SIZE + 2, self.width - 5, self.height +HEADER_SIZE - 5, 1, 0, 0, 0)
 
 	self.isometric = self.mapAPI:getBoolean("Isometric")
 	self.keyUI:setIso(self.isometric)
@@ -447,222 +435,6 @@ function NIM_WorldMap:render()
 	end
 
 	ISPanelJoypad.render(self)
-end
-
-function NIM_WorldMap:getPrintMediaIconSize()
-    local zoom = self.mapAPI:getZoomF()
-    return PZMath.lerp(32, 64, (PZMath.clampFloat(zoom, 12.0, 15.0) - 12) / 3)
-end
-
-function NIM_WorldMap:renderPrintMedia()
-    self.mouseOverPrintMedia = nil
-    if not self.showPrintMedia then return end
-    if not self.character then return end
-    local mediaIDSet = self.character:getReadPrintMedia()
-    local mediaIDList = ArrayList.new(mediaIDSet)
-    if self.mapAPI:getBoolean("AllPrintMedia") then
-        mediaIDList:clear()
-        for k,v in pairs(PrintMediaDefinitions.MiscDetails) do
-            mediaIDList:add(k)
-        end
-    end
-    local mx,my = self:getMouseX(),self:getMouseY()
-    if self.playerNum and ((self.playerNum ~= 0) or (getJoypadData(self.playerNum) ~= nil and not wasMouseActiveMoreRecentlyThanJoypad())) then
-        mx = self.width / 2
-        my = self.height / 2
-    end
-    local iconSize = self:getPrintMediaIconSize()
-    local mouseOver = nil
-    for i=1,mediaIDList:size() do
-        local mediaID = mediaIDList:get(i-1)
-        local details = PrintMediaDefinitions.MiscDetails[mediaID]
-        if details then
-            for j=1,5 do
-                local locations = details["location"..j]
-                if locations then
-                    for _,location in ipairs(locations) do
-                        local sx = self.mapAPI:worldToUIX(location.x1 / 2 + location.x2 / 2, location.y1 / 2 + location.y2 / 2)
-                        local sy = self.mapAPI:worldToUIY(location.x1 / 2 + location.x2 / 2, location.y1 / 2 + location.y2 / 2)
-                        sx = sx - iconSize / 2
-                        sy = sy - iconSize / 2
-                        self:drawTextureScaledAspect(getTexture("Item_Flier"), sx, sy, iconSize, iconSize, 1.0, 1.0, 1.0, 1.0)
-                        if mx >= sx and my >= sy and mx < sx + iconSize and my < sy + iconSize then
-                            mouseOver = { mediaID=mediaID, location=location, x=sx, y=sy }
-                        end
-                    end
-                end
-            end
-        end
-    end
-    if not mouseOver then return end
-    if not self:isPointOver(getMouseX(), getMouseY()) then return end
-    self:drawRectBorder(mouseOver.x, mouseOver.y, iconSize, iconSize, 1.0, 1.0, 1.0, 1.0)
-    local location = mouseOver.location
-    self:drawMapRect(location)
-    local val = Brochure.get(ResourceLocation.of(mouseOver.mediaID)) or Flier.get(ResourceLocation.of(mouseOver.mediaID))
-    local text = getTextOrNull(val:getTranslationKey())
-    if text then
-        local font = UIFont.Medium
-        local FONT_HGT = getTextManager():getFontHeight(font)
-        local textWid = getTextManager():MeasureStringX(font, text)
-        local rx = Math.round(mouseOver.x + iconSize / 2 - textWid / 2 - 4)
-        local ry = Math.round(mouseOver.y - FONT_HGT - 8)
-        local rw = textWid + 4 * 2
-        local rh = FONT_HGT + 2 * 2
-        local r,g,b,a = 50 / 255.0, 130 / 255.0, 246 / 255.0, 1.0
-        self:drawRect(rx, ry, rw, rh, a, r, g, b)
-        self:drawPolygon(nil, rx, ry, rx, ry + rh, rx - rh / 3, ry + rh * 2 / 3, rx - rh / 3, ry + rh * 1 / 3, r, g, b, a)
-        self:drawPolygon(nil, rx + rw, ry, rx + rw, ry + rh, rx + rw + rh / 3, ry + rh * 2 / 3, rx + rw + rh / 3, ry + rh * 1 / 3, r, g, b, a)
-        self:drawTextCentre(text, mouseOver.x + iconSize / 2, mouseOver.y - FONT_HGT - 6, 1.0, 1.0, 1.0, 1.0, font)
-    end
-    self.mouseOverPrintMedia = mouseOver
-end
-
-function NIM_WorldMap:drawMapRect(bounds)
-    local x1 = self.mapAPI:worldToUIX(bounds.x1, bounds.y1)
-    local y1 = self.mapAPI:worldToUIY(bounds.x1, bounds.y1)
-    local x2 = self.mapAPI:worldToUIX(bounds.x2, bounds.y1)
-    local y2 = self.mapAPI:worldToUIY(bounds.x2, bounds.y1)
-    local x3 = self.mapAPI:worldToUIX(bounds.x2, bounds.y2)
-    local y3 = self.mapAPI:worldToUIY(bounds.x2, bounds.y2)
-    local x4 = self.mapAPI:worldToUIX(bounds.x1, bounds.y2)
-    local y4 = self.mapAPI:worldToUIY(bounds.x1, bounds.y2)
-    local thickness = 1
-    self.javaObject:DrawLine(nil, x1, y1, x2, y2, thickness, 1.0, 1.0, 1.0, 1.0)
-    self.javaObject:DrawLine(nil, x2, y2, x3, y3, thickness, 1.0, 1.0, 1.0, 1.0)
-    self.javaObject:DrawLine(nil, x3, y3, x4, y4, thickness, 1.0, 1.0, 1.0, 1.0)
-    self.javaObject:DrawLine(nil, x4, y4, x1, y1, thickness, 1.0, 1.0, 1.0, 1.0)
-end
-
-function NIM_WorldMap:onMouseUpPrintMedia()
-    if not self.mouseOverPrintMedia then return end
-    if self.printMedia and not UIManager.getUI():contains(self.printMedia.javaObj) then
-        self.printMedia = nil
-    end
-    self:closePrintMedia()
-    local val = Brochure.get(ResourceLocation.of(self.mouseOverPrintMedia.mediaID)) or Flier.get(ResourceLocation.of(self.mouseOverPrintMedia.mediaID))
-    local win = PZAPI.UI.PrintMedia{
-        x = 20, y = 20,
-    }
-    win.media_id = self.mouseOverPrintMedia.mediaID
-    win.data = getText(val:getTranslationInfoKey())
-    win.children.bar.children.name.text = getText(val:getTranslationKey())
-    win.textTitle = win.children.bar.children.name.text
-    win.textData = string.gsub(win.data, "\\n", "\n")
-    win:instantiate()
-    for i=1,5 do
-        win.children.bottomButtons.children["revealOnMap"..i]:setVisible(false)
-    end
-    win.javaObj:setAlwaysOnTop(true)
-
-    if getJoypadData(self.playerNum) then
-        ISAtomUIJoypad.Apply(win)
-        win.close = function(self)
-            UIManager.RemoveElement(self.javaObj)
-            if getJoypadData(self.playerNum) then
-                setJoypadFocus(self.playerNum, self.prevFocus)
-            end
-        end
-        win.children.bar.children.closeButton.onLeftClick = function(_self)
-            getSoundManager():playUISound(_self.sounds.activate)
-            _self.parent.parent:close()
-        end
-        win.playerNum = self.playerNum
-        win.prevFocus = getJoypadData(self.playerNum).focus
-        win.onJoypadDown = function(self, button, joypadData)
-            if button == Joypad.BButton then
-                self.children.bar.children.closeButton:onLeftClick()
-            end
-            if button == Joypad.XButton then
-                self:onClickNewspaperButton()
-            end
-            if button == Joypad.YButton then
-                self:onClickMapButton()
-            end
-        end
-        setJoypadFocus(self.playerNum, win)
-    end
-
-    self.printMedia = win
-end
-
-function NIM_WorldMap:closePrintMedia()
-    if not self.printMedia then return end
-    if self.printMedia.close then
-        self.printMedia:close() -- joypad
-    else
-        UIManager.RemoveElement(self.printMedia.javaObj)
-    end
-    self.printMedia = nil
-end
-
-function NIM_WorldMap:renderStashMaps()
-    self.mouseOverStashMap = nil
-    if not self.showPrintMedia then return end
-    if not self.character then return end
-    local stashNameList = StashSystem.getAlreadyReadMap()
-    if self.mapAPI:getBoolean("AllStashMaps") then
-        stashNameList = ArrayList.new()
-        local stashList = StashSystem.getAllStashes()
-        for i=1,stashList:size() do
-            local stash = stashList:get(i-1)
-            stashNameList:add(stash:getName())
-        end
-    end
-    local mx,my = self:getMouseX(),self:getMouseY()
-    if self.playerNum and ((self.playerNum ~= 0) or (getJoypadData(self.playerNum) ~= nil and not wasMouseActiveMoreRecentlyThanJoypad())) then
-        mx = self.width / 2
-        my = self.height / 2
-    end
-    local iconSize = self:getPrintMediaIconSize()
-    local mouseOver = nil
-    for i=1,stashNameList:size() do
-        local stashName = stashNameList:get(i-1)
-        local bounds = self:getStashMapBounds(stashName)
-        if bounds and bounds.x1 then
-            local sx = self.mapAPI:worldToUIX(bounds.x1 / 2 + bounds.x2 / 2, bounds.y1 / 2 + bounds.y2 / 2)
-            local sy = self.mapAPI:worldToUIY(bounds.x1 / 2 + bounds.x2 / 2, bounds.y1 / 2 + bounds.y2 / 2)
-            sx = sx - iconSize / 2
-            sy = sy - iconSize / 2
-            self:drawTextureScaledAspect(getTexture("Item_Map"), sx, sy, iconSize, iconSize, 1.0, 1.0, 1.0, 1.0)
-            if mx >= sx and my >= sy and mx < sx + iconSize and my < sy + iconSize then
-                mouseOver = { stashName=stashName, bounds=bounds, x=sx, y=sy }
-            end
-        end
-    end
-    if not mouseOver then return end
-    if not self:isPointOver(getMouseX(), getMouseY()) then return end
-    if self.stashMapUI and self.stashMapUI:isVisible() and self.stashMapUI:isMouseOver() then return end
-    self:drawRectBorder(mouseOver.x, mouseOver.y, iconSize, iconSize, 1.0, 1.0, 1.0, 1.0)
-    local bounds = mouseOver.bounds
-    self:drawMapRect(bounds)
-    self.mouseOverStashMap = mouseOver
-end
-
-function NIM_WorldMap:getStashMapBounds(stashName)
-    self.stashMapBounds = self.stashMapBounds or {}
-    if self.stashMapBounds[stashName] then
-        return self.stashMapBounds[stashName]
-    end
-    if not self.stashMapBoundsUI then
-        local ui = {}
-        ui.javaObject = UIWorldMap.new(ui)
-        ui.mapAPI = ui.javaObject:getAPIv3()
-        self.stashMapBoundsUI = ui
-    end
-    local bounds = {}
-    local f = LootMaps.Init[stashName]
-    if f then
-        self.stashMapBoundsUI.mapAPI:clearData()
-        self.stashMapBoundsUI.mapAPI:getStyleAPI():clear()
-        f(self.stashMapBoundsUI)
-        bounds.x1 = self.stashMapBoundsUI.mapAPI:getMinXInSquares()
-        bounds.y1 = self.stashMapBoundsUI.mapAPI:getMinYInSquares()
-        bounds.x2 = self.stashMapBoundsUI.mapAPI:getMaxXInSquares() + 1
-        bounds.y2 = self.stashMapBoundsUI.mapAPI:getMaxYInSquares() + 1
-    end
-    self.stashMapBounds[stashName] = bounds
-    return bounds
 end
 
 function NIM_WorldMap:pickMouseOverStreet()
@@ -779,46 +551,6 @@ function NIM_WorldMap:onMouseUpStashMap()
         stash:applyAnnotations(ui.javaObject)
     end
     return true
-end
-
-function NIM_WorldMap:positionStashMap()
-    if not self.stashMapUI or not self.stashMapUI:isVisible() then return end
-    local api = self.stashMapUI.mapAPI
-    local bounds = { x1 = api:getMinXInSquares(), y1 = api:getMinYInSquares(), x2 = api:getMaxXInSquares() + 1, y2 = api:getMaxYInSquares() + 1 }
-    local x1 = self.mapAPI:worldToUIX(bounds.x1, bounds.y1)
-    local y1 = self.mapAPI:worldToUIY(bounds.x1, bounds.y1)
-    local x2 = self.mapAPI:worldToUIX(bounds.x2, bounds.y1)
-    local y2 = self.mapAPI:worldToUIY(bounds.x2, bounds.y1)
-    local x3 = self.mapAPI:worldToUIX(bounds.x2, bounds.y2)
-    local y3 = self.mapAPI:worldToUIY(bounds.x2, bounds.y2)
-    local x4 = self.mapAPI:worldToUIX(bounds.x1, bounds.y2)
-    local y4 = self.mapAPI:worldToUIY(bounds.x1, bounds.y2)
-    local minX = x4
-    local minY = y1
-    local maxX = x2
-    local maxY = y3
-    local width = math.ceil(maxX - minX)
-    local height = math.ceil(maxY - minY)
-    local changed = (self.stashMapUI.width ~= width) or (self.stashMapUI.height ~= height)
-    self.stashMapUI:setX(minX)
-    self.stashMapUI:setY(minY)
-    self.stashMapUI:setWidth(width)
-    self.stashMapUI:setHeight(height)
-    if true or changed then
-        self.stashMapUI.mapAPI:resetView()
-        local zoom = self.stashMapUI.mapAPI:getBaseZoom()
-        self.stashMapUI.mapAPI:setZoom(zoom)
-    end
-    self.stashMapUI.mapAPI:setBoolean("CellGrid", false)
-    self.stashMapUI.mapAPI:setBoolean("Features", true)
-    self.stashMapUI.mapAPI:setBoolean("Isometric", false)
-end
-
-function NIM_WorldMap:closeStashMap()
-    if not self.stashMapUI then return end
-    self:removeChild(self.stashMapUI)
-    self.stashMapUI:setVisible(false)
---    self.stashMapUI = nil
 end
 
 function NIM_WorldMap:renderJoypadPrompt(texture, text, x, y)
@@ -987,35 +719,6 @@ function NIM_WorldMap:onRightMouseUp(x, y)
 	return true
 end
 
-function NIM_WorldMap:onForget()
-	if MainScreen.instance and not MainScreen.instance.inGame then
-		return
-	end
-	if self.forgetUI then
-		self.forgetUI:setVisible(false)
-		self.forgetUI:removeFromUIManager()
-		self.forgetUI = nil
-		return
-	end
-	local modal = ISModalRichText:new(self.width - 40 - 380, self.buttonPanel.y - 40 - 120, 380, 120, getText("IGUI_WorldMap_ConfirmForget"), true, self, self.onConfirmForget, self.playerNum)
-	modal:initialise()
-	modal.prevFocus = self.buttonPanel
-	modal:addToUIManager()
-	modal:setAlwaysOnTop(true)
-	if JoypadState.players[self.playerNum+1] then
-		setJoypadFocus(self.playerNum, modal)
-	end
-	self.forgetUI = modal
-end
-
-function NIM_WorldMap:onConfirmForget(button)
-	self.forgetUI = nil
-	if button.internal ~= "YES" then return end
-	self.mapAPI:getSymbolsAPI():clearUserAnnotations()
-	WorldMapVisited.getInstance():forget()
-	sendClientCommand(getPlayer(), "map", "forget", {});
-end
-
 function NIM_WorldMap:onToggleSymbols()
 	if self.symbolsUI:isVisible() then
 		self.symbolsUI:undisplay()
@@ -1028,13 +731,6 @@ function NIM_WorldMap:onToggleSymbols()
 	end
 end
 
-function NIM_WorldMap:onTogglePrintMedia()
-	self.showPrintMedia = not self.showPrintMedia
-	if not self.showPrintMedia then
-		self:closePrintMedia()
-		self:closeStashMap()
-	end
-end
 
 function NIM_WorldMap:onToggleLegend()
 	if self.keyUI:isVisible() then
@@ -1043,10 +739,6 @@ function NIM_WorldMap:onToggleLegend()
 	else
 		self.keyUI:setVisible(true)
 	end
-end
-
-function NIM_WorldMap:onChangePerspective()
-	self:setIsometric(not self.isometric)
 end
 
 function NIM_WorldMap:onCenterOnPlayer()
@@ -1584,6 +1276,11 @@ function NIM_WorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
         local mapUI = NIM_WorldMap_Instance
         local mapAPI = mapUI.javaObject:getAPIv1()
 
+		local r,g,b = 232/255, 224/255, 211/255
+        local ur,ug,ub = 173/255, 156/255, 128/255 
+
+        mapAPI:setBackgroundRGBA(r, g, b, 1.0)
+        mapAPI:setUnvisitedRGBA(ur, ug, ub, 0)
         mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0) 
 
         return
@@ -1610,6 +1307,11 @@ function NIM_WorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
     local mapUI = NIM_WorldMap_Instance
     local mapAPI = mapUI.javaObject:getAPIv1()
 
+	local r,g,b = 232/255, 224/255, 211/255
+	local ur,ug,ub = 173/255, 156/255, 128/255 
+
+	mapAPI:setBackgroundRGBA(r, g, b, 1.0)
+	mapAPI:setUnvisitedRGBA(ur, ug, ub, 0)
     mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0)
 
     if MainScreen.instance.inGame then

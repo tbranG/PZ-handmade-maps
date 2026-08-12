@@ -186,4 +186,39 @@ function NIM_CreateMemoryRegion(player)
     table.insert(playerModData.visitedRegions, newBox)
 end
 
-Events.OnPlayerUpdate.Add(NIM_CreateMemoryRegion);
+function NIM_MapCleaner(player)
+    local playerModData = player:getModData()
+    local worldMapVisitedInstance = WorldMapVisited.getInstance()
+
+	local cellX = math.floor(player:getX() / 256)
+    local cellY = math.floor(player:getY() / 256)
+
+    local strCoord = NIM.Utils.StringifyCellCoordinate(cellX, cellY)
+	
+	local map = player:getInventory():getAllTypeRecurse("HandmadeMap")
+	if map ~= nil and map:size() > 0 then map = map:get(0) else return end
+
+	local mapModData = map:getModData()
+	if mapModData.haveCells ~= nil and mapModData.haveCells[strCoord] ~= nil then return end
+    
+	local minX = NIM.Utils.Round(cellX * 256)
+    local minY = NIM.Utils.Round(cellY * 256)
+    local maxX = NIM.Utils.Round((cellX * 256) + 256)
+    local maxY = NIM.Utils.Round((cellY * 256) + 256)
+
+    worldMapVisitedInstance:clearKnownInSquares(
+        minX,
+        minY,
+        maxX,
+        maxY
+    )
+    worldMapVisitedInstance:clearVisitedInSquares(
+        minX,
+        minY,
+        maxX,
+        maxY
+    )
+end
+
+Events.OnPlayerUpdate.Add(NIM_CreateMemoryRegion)
+Events.OnPlayerUpdate.Add(NIM_MapCleaner)

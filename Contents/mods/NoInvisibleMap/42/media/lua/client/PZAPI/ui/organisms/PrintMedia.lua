@@ -370,7 +370,7 @@ UI.PrintMedia = UI.Window{
 
                     if map ~= nil then
                         ISTimedActionQueue.clear(playerObj)
-                        ISTimedActionQueue.add(ISReadWorldMap:new(playerObj, centerX, centerY, getMapZoom(maxLen)))
+                        ISTimedActionQueue.add(ReadNIMWorldMap:new(playerObj, centerX, centerY, getMapZoom(maxLen)))
                     else
                         playerObj:Say("I can check that later")
                     end

@@ -21,7 +21,7 @@ option NIM_lvl_one_area
     type = double,
     min = 0.0,
     max = 5.0,
-    default = 1.5,
+    default = 1.0,
     page = HandmadeMaps,
     translation = NIM_LVL_One_Area,
 }

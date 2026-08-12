@@ -19,5 +19,6 @@
     "UI_TransferRegionPencilGreen": "Green",
     "UI_TransferRegionPencilBlack": "Black",
     "UI_TransferRegionFinish": "Finish",
-    "UI_TransferRegionVisited": "Draw from memory"
+    "UI_TransferRegionVisited": "Draw from memory",
+    "UI_WorldMapTitle": "World Map"
 }

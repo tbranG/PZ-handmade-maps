@@ -12,7 +12,7 @@ local function NIM_LoadSandboxConfig()
     else
         NIM.Config.disable_minigames = false
         NIM.Config.auto_open_map = true
-        NIM.Config.lvl_one_area = 1.5
+        NIM.Config.lvl_one_area = 1.0
         NIM.Config.lvl_two_area = 2.0
         NIM.Config.lvl_three_area = 2.5
     end

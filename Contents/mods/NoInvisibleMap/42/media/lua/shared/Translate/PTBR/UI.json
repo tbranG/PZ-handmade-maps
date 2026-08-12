@@ -19,5 +19,6 @@
     "UI_TransferRegionPencilGreen": "Verde",
     "UI_TransferRegionPencilBlack": "Preto",
     "UI_TransferRegionFinish": "Terminar",
-    "UI_TransferRegionVisited": "Desenhar da memória"
+    "UI_TransferRegionVisited": "Desenhar da memória",
+    "UI_WorldMapTitle": "Mapa múndi"
 }

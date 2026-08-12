@@ -21,28 +21,25 @@ local TILE_SIZE = 50
     local mapModData = item:getModData()
     local playerModData = getPlayer():getModData()
 
+    if mapModData.mapRegions == nil then
+        mapModData.mapRegions = {}
+    end
+
     for _, v in pairs(playerModData.visitedRegions) do
-        if mapModData.mapRegions == nil then
-            mapModData.mapRegions = {}
-        end
-
         local isRegionAlreadyOnMap = false
-        local offset = 32
+        local cellCoord = NIM.Utils.StringifyCellCoordinate(
+            math.floor(v.minX / 256),
+            math.floor(v.minY / 256)
+        )
 
-        for _, k in pairs(mapModData.mapRegions) do
-            if v.minX >= k.minX - offset then
-                if v.maxX <= k.maxX + offset then
-                    if v.minY >= k.minY - offset then
-                        if v.maxY <= k.maxY + offset then
-                            isRegionAlreadyOnMap = true
-                        end
-                    end
-                end
-            end
-        end
+        isRegionAlreadyOnMap = mapModData.haveCells ~= nil and mapModData.haveCells[cellCoord]
         
         if not isRegionAlreadyOnMap then
             table.insert(mapModData.mapRegions, v)
+
+            if mapModData.haveCells == nil then mapModData.haveCells = {} end
+            mapModData.haveCells[cellCoord] = true
+
             mapModData.haveNewRegions = true
         
             if mapModData.id == nil then
@@ -66,7 +63,7 @@ local TILE_SIZE = 50
     playerModData.visitedRegions = {}
 
     ISTimedActionQueue.clear(playerObj)
-    ISTimedActionQueue.add(ISReadWorldMap:new(playerObj))
+    ISTimedActionQueue.add(ReadNIMWorldMap:new(playerObj))
 end
 
 -- #######################
@@ -246,7 +243,7 @@ function NIM_TransferRegionWindow:render()
                     self.pixelMatrix[i].y, 
                     TILE_SIZE, 
                     TILE_SIZE,
-                    0.3,
+                    0.4,
                     self.pixelMatrix[i].r,
                     self.pixelMatrix[i].g,
                     self.pixelMatrix[i].b
@@ -260,7 +257,7 @@ function NIM_TransferRegionWindow:render()
             paperTextureY, 
             paperTextureWidth, 
             paperTextureHeight,
-            0.25,
+            0.15,
             1,
             1,
             1
