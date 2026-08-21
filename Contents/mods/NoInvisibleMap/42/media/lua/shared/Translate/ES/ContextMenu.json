@@ -1,0 +1,8 @@
+{
+    "ContextMenu_LocateFunc": "Localizarte",
+    "ContextMenu_LocateDesc": "Adivina tu posición en el mapa mundial. (Necesitas estar en una región conocida)",
+    "ContextMenu_AddRegionFunc": "Añadir región",
+    "ContextMenu_AddRegionDesc": "Añade regiones al mapa mundial. (Se pueden usar tanto bocetos como mapas de botín)",
+    "ContextMenu_SketchFunc": "Dibujar mapa",
+    "ContextMenu_SketchDesc": "Crea un mapa sencillo de tu ubicación actual."
+}

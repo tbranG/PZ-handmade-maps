@@ -35,9 +35,9 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
             end
 
             local boxTable = {
-                _minX = minX - 16,
+                _minX = minX - 32,
                 _minY = minY,
-                _maxX = maxX + 16,
+                _maxX = maxX + 32,
                 _maxY = maxY
             }
 

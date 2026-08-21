@@ -1,0 +1,8 @@
+{
+    "Sandbox_HandmadeMaps": "Mapas hechos a mano",
+    "Sandbox_NIM_Disable_Minigames": "Desactivar minijuegos",
+    "Sandbox_NIM_Auto_Open_Map": "Abrir el mapa automáticamente al terminar de dibujar",
+    "Sandbox_NIM_LVL_One_Area": "Multiplicador del alcance de visión del segundo piso",
+    "Sandbox_NIM_LVL_Two_Area": "Multiplicador del alcance de visión del tercer piso",
+    "Sandbox_NIM_LVL_Three_Area": "Multiplicador del alcance de visión del cuarto piso y superiores"
+}

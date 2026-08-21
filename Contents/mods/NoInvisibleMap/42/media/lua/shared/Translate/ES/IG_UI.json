@@ -1,0 +1,8 @@
+{
+    "IGUI_isInsideF": "No puedo adivinar dónde estoy. Necesito echar un vistazo fuera",
+    "IGUI_isInsideS": "No puedo hacerlo dentro, necesito comprobar a mi alrededor",
+    "IGUI_unknownRegionF": "No tengo ni idea de dónde estoy",
+    "IGUI_unknownRegionS": "No conozco este lugar",
+    "IGUI_failedGuessF": "Hmmmm, ¿por aquí cerca?",
+    "IGUI_failedGuessS": "Quizá en esta zona..."
+}
