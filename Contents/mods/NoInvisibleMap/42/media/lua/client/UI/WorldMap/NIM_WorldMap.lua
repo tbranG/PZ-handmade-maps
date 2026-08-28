@@ -608,17 +608,7 @@ function NIM_WorldMap:onMouseUp(x, y)
 	if self.symbolsUI:onMouseUpMap(x, y) then
 		return true
 	end
-	if wasDragging and not self.dragMoved and self:onMouseUpPrintMedia() then
-		self:closeStashMap()
-		return true
-	end
-	if wasDragging and not self.dragMoved and self:onMouseUpStashMap() then
-		self:closePrintMedia()
-		return true
-	end
-	if wasDragging and not self.dragMoved then
-		self:closeStashMap()
-	end
+	
 	return true
 end
 
