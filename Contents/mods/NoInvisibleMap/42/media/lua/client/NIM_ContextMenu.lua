@@ -16,19 +16,8 @@ local function openDrawMenu(playerObj)
         local player = getPlayer()
         local playerInventory = player:getInventory()
 
-        local sketch = nil
-
-        if isClient() and not isServer() then 
-            sendClientCommand(
-                getPlayer(),
-                "NIM",
-                "CreateSketch",
-                {}
-            )
-        else
-            sketch = playerInventory:AddItem("Base.AreaSketch")    
-            playerInventory:RemoveOneOf("Base.SheetPaper2")
-        end
+        local sketch = playerInventory:AddItem("Base.AreaSketch")
+        playerInventory:RemoveOneOf("Base.SheetPaper2")
         
         local playerCell = player:getCell()
         local zIndex = player:getZ()

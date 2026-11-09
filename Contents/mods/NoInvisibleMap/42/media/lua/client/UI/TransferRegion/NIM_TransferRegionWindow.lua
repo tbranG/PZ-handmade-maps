@@ -46,14 +46,7 @@ local TILE_SIZE = 50
                 mapModData.id = NIM.Utils.GenerateMapId()
             end
 
-            if isClient() and not isServer() then
-                sendClientCommand(
-                    getPlayer(),
-                    "NIM",
-                    "SyncMap",
-                    { id = mapModData.id, modData = mapModData }
-                )
-            elseif isServer() then
+            if isServer() then
                 item:transmitModData()
             end
         end

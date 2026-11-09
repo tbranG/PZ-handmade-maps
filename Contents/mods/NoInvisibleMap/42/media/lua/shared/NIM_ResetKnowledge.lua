@@ -4,7 +4,7 @@ local function RemoveOldVisitedRegions()
         local playerObj = getPlayer()
         local playerModData = playerObj:getModData()
     
-        if playerModData.visitedRegions == nil or {} then return end
+        if playerModData.visitedRegions == nil or #playerModData.visitedRegions < 1 then return end
         NIM.Utils.RemoveRandomElement(playerModData.visitedRegions)
     end
 end 

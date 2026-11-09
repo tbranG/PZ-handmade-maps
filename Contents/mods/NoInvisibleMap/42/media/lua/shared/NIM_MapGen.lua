@@ -22,9 +22,9 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
             if zIndex > 0 then
                 local viewOffset = NIM.Config.lvl_one_area
                 
-                if viewOffset == 2 then 
+                if zIndex == 2 then 
                     viewOffset = NIM.Config.lvl_two_area 
-                else
+                elseif zIndex > 2 then
                     viewOffset = NIM.Config.lvl_three_area
                 end 
 
@@ -46,19 +46,12 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
             modData.custoMapData = boxTable
             modData.mapColor = pencilColor
 
-            -- ensure the map has a unique id for synchronization
+            -- ensure the map has a unique id
             if modData.id == nil then
                 modData.id = NIM.Utils.GenerateMapId()
             end
 
-            if isClient() and not isServer() then
-                sendClientCommand(
-                    getPlayer(),
-                    "NIM",
-                    "SyncMap",
-                    { id = modData.id, modData = modData }
-                )
-            elseif isServer() then
+            if isServer() then
                 sketch:transmitModData()
             end
         end
@@ -69,7 +62,6 @@ end
 -- This function it's used when you add a loot map to your world map
 function NIM_AddRegion(worldMap, inputItem)
     local mapData = worldMap:getModData()
-    local mapRegions = mapData.mapRegions
 
     local _minX = 0
     local _minY = 0
@@ -188,7 +180,7 @@ function NIM_AddRegion(worldMap, inputItem)
             if mapData.haveCells[strCoord] then 
                 alreadyCovered = alreadyCovered + 1 
             else
-                if mapRegions == nil then
+                if mapData.mapRegions == nil then
                     local data = {}
                     table.insert(data, box)
                     mapData.mapRegions = data
@@ -203,18 +195,11 @@ function NIM_AddRegion(worldMap, inputItem)
 
     mapData.haveNewRegions = true
 
-    if isClient() and not isServer() then
-        if mapData.id == nil then
-            mapData.id = NIM.Utils.GenerateMapId()
-        end
+    if mapData.id == nil then
+        mapData.id = NIM.Utils.GenerateMapId()
+    end
 
-        sendClientCommand(
-            getPlayer(),
-            "NIM",
-            "SyncMap",
-            { id = mapData.id, modData = mapData }
-        )
-    elseif isServer() then
+    if isServer() then
         worldMap:transmitModData()
     end
 

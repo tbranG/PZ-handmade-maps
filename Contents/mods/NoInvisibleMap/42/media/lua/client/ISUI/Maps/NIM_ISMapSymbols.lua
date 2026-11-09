@@ -120,14 +120,14 @@ function NIM_ISMapOverrides()
 					mapData.notes = data
 				else
 					table.insert(mapNotes, {
-						text = symbol:getUntranslatedText() or symbol:getTranslatedText(),
-						x = symbol:getWorldX(),
-						y = symbol:getWorldY(),
-						r = symbol:getRed(),
-						g = symbol:getGreen(),
-						b = symbol:getBlue(),
-                        scale = symbol:getScale(),
-                        rotation = symbol:getRotation()
+						text = textSymbol:getUntranslatedText() or textSymbol:getTranslatedText(),
+						x = textSymbol:getWorldX(),
+						y = textSymbol:getWorldY(),
+						r = textSymbol:getRed(),
+						g = textSymbol:getGreen(),
+						b = textSymbol:getBlue(),
+                        scale = textSymbol:getScale(),
+                        rotation = textSymbol:getRotation()
 					})
 				end
             end
