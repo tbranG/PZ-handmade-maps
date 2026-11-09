@@ -50,10 +50,6 @@ function NIM_GenerateMap(sketch, playerCell, outside, playerCanSeeOutside, zInde
             if modData.id == nil then
                 modData.id = NIM.Utils.GenerateMapId()
             end
-
-            if isServer() then
-                sketch:transmitModData()
-            end
         end
     end
 end
@@ -197,10 +193,6 @@ function NIM_AddRegion(worldMap, inputItem)
 
     if mapData.id == nil then
         mapData.id = NIM.Utils.GenerateMapId()
-    end
-
-    if isServer() then
-        worldMap:transmitModData()
     end
 
     local playerObj = getPlayer()

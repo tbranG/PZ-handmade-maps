@@ -45,10 +45,6 @@ local TILE_SIZE = 50
             if mapModData.id == nil then
                 mapModData.id = NIM.Utils.GenerateMapId()
             end
-
-            if isServer() then
-                item:transmitModData()
-            end
         end
     end
 
