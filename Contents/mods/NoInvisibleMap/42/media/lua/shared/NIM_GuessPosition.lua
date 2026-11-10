@@ -76,7 +76,7 @@ function NIM_GuessPosition()
         end
 
         ISTimedActionQueue.clear(playerObj)
-        ISTimedActionQueue.add(ISReadWorldMap:new(playerObj, x + offsetX, y + offsetY, zoomSize))
+        ISTimedActionQueue.add(ReadNIMWorldMap:new(playerObj, x + offsetX, y + offsetY, zoomSize))
     end
 
     local map = player:getInventory():getAllTypeRecurse("HandmadeMap")

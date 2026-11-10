@@ -2,6 +2,7 @@ require "ISUI/ISInventoryPaneContextMenu"
 require "UI/DrawMap/NIM_DrawMapWindow"
 require "UI/TransferRegion/NIM_TransferRegionWindow"
 require "TimedActions/SketchDrawingAction" 
+require "TimedActions/ReadNIMWorldMap"
 
 NIM_HandmadeMapContext = {}
 
