@@ -25,6 +25,23 @@ function NIM_InitCustomMap()
 		layer:addFill(MAXZ, 59, 141, 149, 255)
 	end
     
+    local function addCustomPyramid(mapUI, styleAPI)
+        local mapAPI = mapUI.javaObject:getAPIv3()
+        if not mapUI.NIMCustomPyramidAdded then
+            mapAPI:addImagePyramid("media/customMap/nim.pyramid.zip")
+            mapUI.NIMCustomPyramidAdded = true
+        end
+
+        local pyramidLayer = styleAPI:newPyramidLayer("nim-custom-pyramid")
+        pyramidLayer:setPyramidFileName("nim.pyramid.zip")
+        pyramidLayer:addFill(0.0, 255, 255, 255, 128)
+        pyramidLayer:addFill(MAXZ, 255, 255, 255, 128)
+
+        local layerIndex = styleAPI:indexOfLayer("nim-custom-pyramid")
+        local forestPyramidIndex = styleAPI:indexOfLayer("pyramid-forest")
+        styleAPI:moveLayer(layerIndex, forestPyramidIndex + 1)
+    end
+
     local function forestPyramidStyle(mapUI)
         local mapAPI = mapUI.javaObject:getAPIv3()
         local styleAPI = mapAPI:getStyleAPI()
@@ -45,6 +62,8 @@ function NIM_InitCustomMap()
         local index1 = styleAPI:indexOfLayer("pyramid-forest")
         local index2 = styleAPI:indexOfLayer("forest")
         styleAPI:moveLayer(index1, index2 + 1)
+
+        addCustomPyramid(mapUI, styleAPI)
     end
 
     -- custom styles 
@@ -1097,6 +1116,11 @@ function NIM_InitCustomMap()
         styleAPI:moveLayer(index1, index2 + 1)
 
         MapUtils.initDefaultTextLayersV3(mapUI)
+    end
+
+    function MapUtils.initHandmadeWorldMapStyleV3(mapUI)
+        MapUtils.initDefaultStyleV3(mapUI)
+        addCustomPyramid(mapUI, mapUI.javaObject:getAPIv3():getStyleAPI())
     end
 
     -- custom map data for sketches

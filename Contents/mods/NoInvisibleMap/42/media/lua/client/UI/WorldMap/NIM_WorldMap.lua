@@ -344,7 +344,7 @@ function NIM_WorldMap:prerender()
 	ISPanelJoypad.prerender(self)
 	self.symbolsUI:prerenderMap()
 	if self.mapAPI:getBoolean("ColorblindPatterns") ~= getCore():getOptionColorblindPatterns() then
-		MapUtils.initDefaultStyleV3(self)
+		MapUtils.initHandmadeWorldMapStyleV3(self)
 		MapUtils.overlayPaper(self)
 	end
 
@@ -660,7 +660,7 @@ function NIM_WorldMap:onRightMouseUp(x, y)
 	-- DEV: Apply the style again after reloading ISMapDefinitions.lua
 	option = context:addOption("Reapply Style", self,
 		function(self)
-			MapUtils.initDefaultStyleV3(self)
+			MapUtils.initHandmadeWorldMapStyleV3(self)
 			MapUtils.overlayPaper(self)
 		end)
 
@@ -777,7 +777,7 @@ function NIM_WorldMap:onToggleTerrainImage()
     if self.isTerrainImage then
 	    self:showTerrainImage()
     else
-	    MapUtils.initDefaultStyleV3(self)
+	    MapUtils.initHandmadeWorldMapStyleV3(self)
 	    MapUtils.overlayPaper(self)
     end
     self.mapAPI:setBoolean("TerrainImage", self.isTerrainImage)
@@ -1166,7 +1166,7 @@ function NIM_WorldMap:initDataAndStyle()
 		markers:addGridSquareMarker(11342, 6779, 50, 1.0, 1.0, 0.0, 1.0)
 		self.hideUnvisitedAreas = false
 	end
-	MapUtils.initDefaultStyleV3(self)
+	MapUtils.initHandmadeWorldMapStyleV3(self)
 	MapUtils.overlayPaper(self)
 end
 
@@ -1483,4 +1483,3 @@ Events.OnKeyStartPressed.Add(NIM_WorldMap.onKeyStartPressed)
 Events.OnKeyKeepPressed.Add(NIM_WorldMap.onKeyKeepPressed)
 Events.OnKeyPressed.Add(NIM_WorldMap.onKeyReleased)
 Events.OnPlayerDeath.Add(NIM_WorldMap.OnPlayerDeath)
-
