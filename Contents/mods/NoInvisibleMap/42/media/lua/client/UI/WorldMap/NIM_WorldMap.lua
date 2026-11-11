@@ -1267,11 +1267,10 @@ function NIM_WorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
         local mapAPI = mapUI.javaObject:getAPIv1()
 
 		local r,g,b = 232/255, 224/255, 211/255
-        local ur,ug,ub = 173/255, 156/255, 128/255 
 
         mapAPI:setBackgroundRGBA(r, g, b, 1.0)
-        mapAPI:setUnvisitedRGBA(ur, ug, ub, 0)
-        mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0) 
+        mapAPI:setUnvisitedRGBA(22/255, 22/255, 25/255, 1.0)
+        mapAPI:setUnvisitedGridRGBA(1.0, 1.0, 1.0, 0.5)
 
         return
     end
@@ -1298,11 +1297,10 @@ function NIM_WorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
     local mapAPI = mapUI.javaObject:getAPIv1()
 
 	local r,g,b = 232/255, 224/255, 211/255
-	local ur,ug,ub = 173/255, 156/255, 128/255 
 
 	mapAPI:setBackgroundRGBA(r, g, b, 1.0)
-	mapAPI:setUnvisitedRGBA(ur, ug, ub, 0)
-    mapAPI:setUnvisitedGridRGBA(0, 0, 0, 0)
+	mapAPI:setUnvisitedRGBA(22/255, 22/255, 25/255, 1.0)
+    mapAPI:setUnvisitedGridRGBA(1.0, 1.0, 1.0, 0.5)
 
     if MainScreen.instance.inGame then
         for i=1,getNumActivePlayers() do
