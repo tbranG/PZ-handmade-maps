@@ -4,5 +4,7 @@
     "IGUI_unknownRegionF": "I have no idea where I am",
     "IGUI_unknownRegionS": "I don't known this place",
     "IGUI_failedGuessF": "Hmmmmm, somewhere around here?",
-    "IGUI_failedGuessS": "Maybe in this area..."
+    "IGUI_failedGuessS": "Maybe in this area...",
+    "IGUI_NIM_NewVisitedRegion": "+ New visited region",
+    "IGUI_NIM_NoWorldMapFound": "No world map found"
 }

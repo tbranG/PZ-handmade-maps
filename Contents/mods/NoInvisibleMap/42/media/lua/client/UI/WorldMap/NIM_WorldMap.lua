@@ -344,8 +344,7 @@ function NIM_WorldMap:prerender()
 	ISPanelJoypad.prerender(self)
 	self.symbolsUI:prerenderMap()
 	if self.mapAPI:getBoolean("ColorblindPatterns") ~= getCore():getOptionColorblindPatterns() then
-		MapUtils.initHandmadeWorldMapStyleV3(self)
-		MapUtils.overlayPaper(self)
+		MapUtils.initCustomStyleColored(self)
 	end
 
 	MapUtils.renderDarkModeOverlay(self)
@@ -660,8 +659,7 @@ function NIM_WorldMap:onRightMouseUp(x, y)
 	-- DEV: Apply the style again after reloading ISMapDefinitions.lua
 	option = context:addOption("Reapply Style", self,
 		function(self)
-			MapUtils.initHandmadeWorldMapStyleV3(self)
-			MapUtils.overlayPaper(self)
+			MapUtils.initCustomStyleColored(self)
 		end)
 
 	local worldX = self.mapAPI:uiToWorldX(x, y)
@@ -777,8 +775,7 @@ function NIM_WorldMap:onToggleTerrainImage()
     if self.isTerrainImage then
 	    self:showTerrainImage()
     else
-	    MapUtils.initHandmadeWorldMapStyleV3(self)
-	    MapUtils.overlayPaper(self)
+	    MapUtils.initCustomStyleColored(self)
     end
     self.mapAPI:setBoolean("TerrainImage", self.isTerrainImage)
 end
@@ -1166,8 +1163,7 @@ function NIM_WorldMap:initDataAndStyle()
 		markers:addGridSquareMarker(11342, 6779, 50, 1.0, 1.0, 0.0, 1.0)
 		self.hideUnvisitedAreas = false
 	end
-	MapUtils.initHandmadeWorldMapStyleV3(self)
-	MapUtils.overlayPaper(self)
+	MapUtils.initCustomStyleColored(self)
 end
 
 function NIM_WorldMap:new(x, y, width, height)
@@ -1263,15 +1259,6 @@ function NIM_WorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
             end
         end
 
-        local mapUI = NIM_WorldMap_Instance
-        local mapAPI = mapUI.javaObject:getAPIv1()
-
-		local r,g,b = 232/255, 224/255, 211/255
-
-        mapAPI:setBackgroundRGBA(r, g, b, 1.0)
-        mapAPI:setUnvisitedRGBA(22/255, 22/255, 25/255, 1.0)
-        mapAPI:setUnvisitedGridRGBA(1.0, 1.0, 1.0, 0.5)
-
         return
     end
 
@@ -1292,15 +1279,6 @@ function NIM_WorldMap.ShowWorldMap(playerNum, centerX, centerY, zoom)
     NIM_WorldMap_Instance:setVisible(true)
     NIM_WorldMap_Instance:addToUIManager()
     NIM_WorldMap_Instance.getJoypadFocus = true
-
-    local mapUI = NIM_WorldMap_Instance
-    local mapAPI = mapUI.javaObject:getAPIv1()
-
-	local r,g,b = 232/255, 224/255, 211/255
-
-	mapAPI:setBackgroundRGBA(r, g, b, 1.0)
-	mapAPI:setUnvisitedRGBA(22/255, 22/255, 25/255, 1.0)
-    mapAPI:setUnvisitedGridRGBA(1.0, 1.0, 1.0, 0.5)
 
     if MainScreen.instance.inGame then
         for i=1,getNumActivePlayers() do
@@ -1331,7 +1309,7 @@ function NIM_WorldMap.ToggleWorldMap(playerNum)
     local map = playerInv:getFirstEvalRecurse(function(item) return item:getFullType() == "Base.HandmadeMap" end)
 
     if map == nil then
-        HaloTextHelper.addBadText(playerObj, "No world map found");
+        HaloTextHelper.addBadText(playerObj, getText("IGUI_NIM_NoWorldMapFound"));
         return
     end
 

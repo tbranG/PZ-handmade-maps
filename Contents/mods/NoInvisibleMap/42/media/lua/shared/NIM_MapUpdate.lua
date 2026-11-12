@@ -1,3 +1,9 @@
+--globals for easy access
+local hider_lastTime = getTimestamp()
+local fixer_lastTime = getTimestamp()
+
+local quick_mapModData_ref = nil
+
 -- initializes world map custom data (known regions, symbols, annotations and points of interest)
 function NIM_AddMapData()
 	local symbolsApi = NIM_WorldMap_Instance.mapAPI:getSymbolsAPIv2()
@@ -9,6 +15,7 @@ function NIM_AddMapData()
     
 	if map ~= nil then
 		local mapData = map:getModData()
+		playerModData.quickMapRef = mapData
 		
 		if mapData.haveNewSymbols or mapData.haveNewRegions or mapData.id ~= (playerModData.lastReadMap or "") then 
             WorldMapVisited.getInstance():forget()
@@ -156,6 +163,7 @@ function NIM_UpdateMapData()
 		end
 
 		mapData.haveNewSymbols = false
+		playerModData.quickMapRef = nil
 	end
 
 end
@@ -183,23 +191,43 @@ function NIM_CreateMemoryRegion(player)
         maxY = (cellY * 256) + 256
     }
 	
+	HaloTextHelper.addGoodText(player, getText("IGUI_NIM_NewVisitedRegion"))
     table.insert(playerModData.visitedRegions, newBox)
 end
 
-function NIM_MapCleaner(player)
+function NIM_MapPosHider()
+	local player = getPlayer()
     local playerModData = player:getModData()
+
+	local currentTime = getTimestamp()
+    local dt = (currentTime - hider_lastTime) / 1000.0
+	hider_lastTime = currentTime
+
+	local playerModData = player:getModData()
+
+	playerModData.hiderTick = playerModData.hiderTick or 0
+	playerModData.hiderTick = playerModData.hiderTick + dt
+
+	if playerModData.hiderTick < 0.0005 then return end
+	playerModData.hiderTick = 0
+
     local worldMapVisitedInstance = WorldMapVisited.getInstance()
 
 	local cellX = math.floor(player:getX() / 256)
     local cellY = math.floor(player:getY() / 256)
 
     local strCoord = NIM.Utils.StringifyCellCoordinate(cellX, cellY)
-	
-	local map = player:getInventory():getAllTypeRecurse("HandmadeMap")
-	if map ~= nil and map:size() > 0 then map = map:get(0) else return end
 
-	local mapModData = map:getModData()
-	if mapModData.haveCells ~= nil and mapModData.haveCells[strCoord] ~= nil then return end
+	local mapModData = quick_mapModData_ref or playerModData.quickMapRef
+	if mapModData == nil then
+		local mapObj = player:getInventory():getAllTypeRecurse("HandmadeMap")
+		if mapObj ~= nil and mapObj:size() > 0  then
+			mapObj = mapObj:get(0)
+			quick_mapModData_ref = mapObj:getModData()
+		end
+	end
+
+	if mapModData == nil or (mapModData.haveCells and (mapModData.haveCells[strCoord] or false)) then return end
     
 	local minX = NIM.Utils.Round(cellX * 256)
     local minY = NIM.Utils.Round(cellY * 256)
@@ -207,18 +235,73 @@ function NIM_MapCleaner(player)
     local maxY = NIM.Utils.Round((cellY * 256) + 256)
 
     worldMapVisitedInstance:clearKnownInSquares(
-        minX,
-        minY,
-        maxX,
-        maxY
+        minX + 32,
+        minY + 32,
+        maxX - 32,
+        maxY - 32
     )
     worldMapVisitedInstance:clearVisitedInSquares(
-        minX,
-        minY,
-        maxX,
-        maxY
+        minX + 32,
+        minY + 32,
+        maxX - 32,
+        maxY - 32
     )
 end
 
+function NIM_MapAdjRegionsFixer()
+	local player = getPlayer()
+	local playerModData = player:getModData()
+
+	local mapModData = quick_mapModData_ref or playerModData.quickMapRef
+	if mapModData == nil then
+		local mapObj = player:getInventory():getAllTypeRecurse("HandmadeMap")
+		if mapObj ~= nil and mapObj:size() > 0  then
+			mapObj = mapObj:get(0)
+			quick_mapModData_ref = mapObj:getModData()
+		end
+	end
+
+	if not playerModData.NIM_WorldMapOpen then return end
+
+	local currentTime = getTimestamp()
+    local dt = (currentTime - fixer_lastTime) / 1000.0
+	fixer_lastTime = currentTime
+
+	playerModData.fixerTick = playerModData.fixerTick or 0
+	playerModData.fixerTick = playerModData.fixerTick + dt
+
+	if playerModData.fixerTick < 0.05 then return end
+	playerModData.fixerTick = 0
+
+    local worldMapVisitedInstance = WorldMapVisited.getInstance()
+
+	local cellX = math.floor(player:getX() / 256)
+    local cellY = math.floor(player:getY() / 256)
+	local strCoord = NIM.Utils.StringifyCellCoordinate(cellX, cellY)
+
+	if mapModData == nil then return end
+	if mapModData.haveCells and (mapModData.haveCells[strCoord] or false) then return end
+
+	for dx = -1, 1 do
+        for dy = -1, 1 do
+            if math.abs(dx) + math.abs(dy) == 1 then
+                local x = cellX + dx
+                local y = cellY + dy
+                strCoord = NIM.Utils.StringifyCellCoordinate(x, y)
+
+                if mapModData.haveCells[strCoord] then
+                    local minX = NIM.Utils.Round(x * 256)
+                    local minY = NIM.Utils.Round(y * 256)
+                    local maxX = NIM.Utils.Round((x * 256) + 256)
+                    local maxY = NIM.Utils.Round((y * 256) + 256)
+                    worldMapVisitedInstance:setVisitedInSquares(minX, minY, maxX, maxY)
+                end
+            end
+        end
+    end
+end
+
 Events.OnPlayerUpdate.Add(NIM_CreateMemoryRegion)
-Events.OnPlayerUpdate.Add(NIM_MapCleaner)
+
+Events.OnTick.Add(NIM_MapPosHider)
+Events.OnTick.Add(NIM_MapAdjRegionsFixer)

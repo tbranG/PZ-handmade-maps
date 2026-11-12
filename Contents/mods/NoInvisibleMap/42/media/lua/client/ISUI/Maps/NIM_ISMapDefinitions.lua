@@ -754,11 +754,10 @@ function NIM_InitCustomMap()
         local ColorblindPatterns = getCore():getOptionColorblindPatterns()
         mapAPI:setBoolean("ColorblindPatterns", ColorblindPatterns)
     
-        local r,g,b = 219/255, 215/255, 192/255
         local cr,cg,cb = 227/255, 227/255, 227/255
         mapAPI:setBackgroundRGBA(cr, cg, cb, 1.0)
-        mapAPI:setUnvisitedRGBA(r * 0.915, g * 0.915, b * 0.915, 1.0)
-        mapAPI:setUnvisitedGridRGBA(r * 0.777, g * 0.777, b * 0.777, 1.0)
+        mapAPI:setUnvisitedRGBA(22/255, 22/255, 25/255, 1.0)
+        mapAPI:setUnvisitedGridRGBA(1.0, 1.0, 1.0, 0.5)
     
         styleAPI:clear()
     
