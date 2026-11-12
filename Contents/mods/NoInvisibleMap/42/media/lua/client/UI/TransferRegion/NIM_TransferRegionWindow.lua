@@ -1,4 +1,7 @@
-NIM_TransferRegionWindow = ISPanel:derive("NIM_TransferRegionWindow");
+require "ISUI/ISPanelJoypad"
+require "NIM_VirtualCursor"
+
+NIM_TransferRegionWindow = ISPanelJoypad:derive("NIM_TransferRegionWindow");
 
 local WINDOW_WIDTH = 860
 local WINDOW_HEIGHT = 460
@@ -192,6 +195,7 @@ function NIM_TransferRegionWindow:render()
             1, 1, 1, 1, 
             UIFont.Small
         )
+        ISPanelJoypad.render(self)
         return
     end
 
@@ -219,6 +223,7 @@ function NIM_TransferRegionWindow:render()
             1, 1, 1, 1, 
             UIFont.Small
         )
+        ISPanelJoypad.render(self)
         return
     end
     -- ===========================================================
@@ -254,9 +259,12 @@ function NIM_TransferRegionWindow:render()
 
         -- Pencil aim
         local aimWidth, aimHeight = 50, 50
-        self:drawRectBorder(self:getMouseX() - (aimWidth / 2), self:getMouseY() - (aimHeight / 2), aimWidth, aimHeight, 1, 0.3, 0.3, 0.3)
-        self:drawRectBorder(self:getMouseX() - (aimWidth / 2) - 1, self:getMouseY() - (aimHeight / 2) - 1, aimWidth, aimHeight, 1, 0.9, 0.9, 0.9)
+        local cursorX, cursorY = NIM_VirtualCursor.getPosition(self)
+        self:drawRectBorder(cursorX - (aimWidth / 2), cursorY - (aimHeight / 2), aimWidth, aimHeight, 1, 0.3, 0.3, 0.3)
+        self:drawRectBorder(cursorX - (aimWidth / 2) - 1, cursorY - (aimHeight / 2) - 1, aimWidth, aimHeight, 1, 0.9, 0.9, 0.9)
+        NIM_VirtualCursor.render(self)
         
+        ISPanelJoypad.render(self)
         return
     end
     -- ===========================================================
@@ -338,12 +346,13 @@ function NIM_TransferRegionWindow:render()
             end
         end
     end
+    ISPanelJoypad.render(self)
 end
 
 
 function NIM_TransferRegionWindow:new(x, y, width, height)
     local o = {};
-    o = ISPanel:new(x, y, width, height);
+    o = ISPanelJoypad:new(x, y, width, height);
     setmetatable(o, self);
     self.__index = self;
     o.variableColor={r=0.9, g=0.55, b=0.1, a=1};
@@ -356,8 +365,9 @@ end
 
 
 function NIM_TransferRegionWindow:initialise()
-    ISPanel.initialise(self)
+    ISPanelJoypad.initialise(self)
     self:create()
+    self:autoGenerateJoypadButtonsLists()
     NIM_TransferRegionWindow.instance = self
 
     self.character = getPlayer()
@@ -615,6 +625,9 @@ function NIM_TransferRegionWindow:create()
             self.selectedInput = i;
             self.targetMapItem = self.playerMapItems:get(i-1);
             self.selectedPixelOverlay = cellRef;
+            if self.joyfocus then
+                self:setJoypadFocus(self.finish, self.joyfocus)
+            end
         end);
         button.internal = "MAP_INPUT_" .. i;
         button:initialise();
@@ -628,8 +641,37 @@ end
 
 
 function NIM_TransferRegionWindow:close()
+    NIM_VirtualCursor.restoreFocus(self)
     NIM_TransferRegionWindow.instance = nil
     ISPanel.close(self)
+end
+
+function NIM_TransferRegionWindow:onGainJoypadFocus(joypadData)
+    ISPanelJoypad.onGainJoypadFocus(self, joypadData)
+    if not self.virtualCursor then
+        NIM_VirtualCursor.init(self, 650, 215)
+    end
+    self:restoreJoypadFocus(joypadData)
+end
+
+function NIM_TransferRegionWindow:onJoypadDown(button, joypadData)
+    if button == Joypad.BButton then
+        self.exit:forceClick()
+        return
+    end
+    if button == Joypad.AButton and self.drawMode then
+        local focusedChild = self:getJoypadFocus()
+        if focusedChild and focusedChild.isButton and focusedChild.enable ~= false then
+            ISPanelJoypad.onJoypadDown(self, button, joypadData)
+            return
+        end
+        local cursorX, cursorY = NIM_VirtualCursor.getPosition(self)
+        if cursorX >= 450 and cursorX < 850 and cursorY >= 40 and cursorY < 390 then
+            self:paintAt(cursorX, cursorY, true)
+            return
+        end
+    end
+    ISPanelJoypad.onJoypadDown(self, button, joypadData)
 end
 
 
@@ -644,6 +686,13 @@ function NIM_TransferRegionWindow:open(source)
 
     modal:initialise()
     modal:addToUIManager()
+    local playerNum = modal.character:getPlayerNum()
+    local joypadData = JoypadState.players[playerNum + 1]
+    if joypadData then
+        modal.prevFocus = getJoypadFocus(playerNum)
+        NIM_VirtualCursor.init(modal, 650, 215)
+        setJoypadFocus(playerNum, modal)
+    end
 end
 
 
@@ -679,6 +728,10 @@ function NIM_TransferRegionWindow:onOptionMouseDown(button, x, y)
         self.selectedInput = 0;
 
         self.drawMode = true;
+        self.draw.enable = false
+        if self.joyfocus then
+            self:setJoypadFocus(self.finish, self.joyfocus)
+        end
     end
     if button.internal == "FINISH" then
         if self.drawMode then
@@ -701,6 +754,10 @@ function NIM_TransferRegionWindow:onTick()
         return
     end
 
+    if window.joyfocus then
+        NIM_VirtualCursor.update(window)
+    end
+
     local tooDark = window.character:tooDarkToRead()
 
     if tooDark or window.missingPencils then
@@ -714,56 +771,51 @@ function NIM_TransferRegionWindow:onTick()
         window.finish.enable = false
     end
 
-    if window.drawMode then    
-        local mouseX = window:getMouseX()
-        local mouseY = window:getMouseY()
-    
-        local r, g, b
-    
-        local pencil = ZombRand(4)
-        if pencil == 0 then
-            r = 0.2;
-            g = 0.2;
-            b = 0.2;
-        elseif pencil == 1 then
-            r = 1;
-            g = 77/255;
-            b = 77/255;
-        elseif pencil == 2 then
-            r = 51/255;
-            g = 153/255;
-            b = 1;
+    if window.drawMode then
+        if window.joyfocus then return end
+        window:paintAt(window:getMouseX(), window:getMouseY(), false)
+    end
+end
+
+function NIM_TransferRegionWindow:paintAt(mouseX, mouseY, virtual)
+    local tooDark = self.character:tooDarkToRead()
+    if tooDark or self.missingPencils then return end
+
+    local r, g, b
+    local pencil = ZombRand(4)
+    if pencil == 0 then
+        r, g, b = 0.2, 0.2, 0.2
+    elseif pencil == 1 then
+        r, g, b = 1, 77/255, 77/255
+    elseif pencil == 2 then
+        r, g, b = 51/255, 153/255, 1
+    else
+        r, g, b = 102/255, 1, 102/255
+    end
+
+    for i = 1, #self.pixelMatrix do
+        local pixel = self.pixelMatrix[i]
+        local hit
+        if virtual then
+            hit = mouseX >= pixel.x and mouseX < pixel.x + TILE_SIZE
+                and mouseY >= pixel.y and mouseY < pixel.y + TILE_SIZE
         else
-            r = 102/255;
-            g = 1;
-            b = 102/255;
+            hit = mouseX > pixel.x - 5 and mouseX < pixel.x + 75
+                and mouseY > pixel.y + 5 and mouseY < pixel.y + 90
         end
-    
-        local leftCollisionOffset = -5
-        local rightCollisionOffset = 75
-        local topCollisionOffset = 5
-        local bottomCollisionOffset = 90
-    
-        if window.pixelMatrix ~= nil then
-            for i = 1, #window.pixelMatrix do
-                if (mouseX > window.pixelMatrix[i].x + leftCollisionOffset and mouseX < window.pixelMatrix[i].x + rightCollisionOffset) and 
-                (mouseY > window.pixelMatrix[i].y + topCollisionOffset and mouseY < window.pixelMatrix[i].y + bottomCollisionOffset) then
-                    if window.pixelMatrix[i].toColor and not window.pixelMatrix[i].colored then
-                        window.pixelMatrix[i].r = r
-                        window.pixelMatrix[i].g = g
-                        window.pixelMatrix[i].b = b
-                        window.pixelMatrix[i].colored = true
-    
-                        window.coloredPixels = window.coloredPixels + 1
-                        window.character:playSound("Painting")
-                    end
-                end
-            end
+        if hit and pixel.toColor and not pixel.colored then
+            pixel.r = r
+            pixel.g = g
+            pixel.b = b
+            pixel.colored = true
+            self.coloredPixels = self.coloredPixels + 1
+            self.character:playSound("Painting")
+            if virtual then break end
         end
-    
-        if window.coloredPixels == window.pixelsToColor then
-            window.finalizedDrawing = true
-        end
+    end
+
+    if self.coloredPixels == self.pixelsToColor then
+        self.finalizedDrawing = true
     end
 end
 

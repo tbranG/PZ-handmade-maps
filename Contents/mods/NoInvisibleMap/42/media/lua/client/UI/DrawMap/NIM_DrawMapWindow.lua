@@ -1,6 +1,8 @@
 require "TimedActions/SketchDrawingAction" 
+require "ISUI/ISPanelJoypad"
+require "NIM_VirtualCursor"
 
-NIM_DrawMapWindow = ISPanel:derive("NIM_DrawMapWindow");
+NIM_DrawMapWindow = ISPanelJoypad:derive("NIM_DrawMapWindow");
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 
@@ -97,6 +99,7 @@ function NIM_DrawMapWindow:render()
             1, 1, 1, 1, 
             UIFont.Small
         )
+        ISPanelJoypad.render(self)
         return
     end
 
@@ -120,15 +123,18 @@ function NIM_DrawMapWindow:render()
     -- Pencil aim
     if self.canDraw then
         local aimWidth, aimHeight = 50, 50
-        self:drawRectBorder(self:getMouseX() - (aimWidth / 2), self:getMouseY() - (aimHeight / 2), aimWidth, aimHeight, 1, 0.3, 0.3, 0.3)
-        self:drawRectBorder(self:getMouseX() - (aimWidth / 2) - 1, self:getMouseY() - (aimHeight / 2) - 1, aimWidth, aimHeight, 1, 0.9, 0.9, 0.9)
+        local cursorX, cursorY = NIM_VirtualCursor.getPosition(self)
+        self:drawRectBorder(cursorX - (aimWidth / 2), cursorY - (aimHeight / 2), aimWidth, aimHeight, 1, 0.3, 0.3, 0.3)
+        self:drawRectBorder(cursorX - (aimWidth / 2) - 1, cursorY - (aimHeight / 2) - 1, aimWidth, aimHeight, 1, 0.9, 0.9, 0.9)
+        NIM_VirtualCursor.render(self)
     end
+    ISPanelJoypad.render(self)
 end
 
 
 function NIM_DrawMapWindow:new(x, y, width, height)
     local o = {};
-    o = ISPanel:new(x, y, width, height);
+    o = ISPanelJoypad:new(x, y, width, height);
     setmetatable(o, self);
     self.__index = self;
     o.variableColor={r=0.9, g=0.55, b=0.1, a=1};
@@ -141,8 +147,9 @@ end
 
 
 function NIM_DrawMapWindow:initialise()
-    ISPanel.initialise(self)
+    ISPanelJoypad.initialise(self)
     self:create()
+    self:autoGenerateJoypadButtonsLists()
     NIM_DrawMapWindow.instance = self
 
     self.altitudes = { AREA_Z_0, AREA_Z_1, AREA_Z_2, AREA_Z_3 }
@@ -358,10 +365,38 @@ end
 
 
 function NIM_DrawMapWindow:close()
+    NIM_VirtualCursor.restoreFocus(self)
     NIM_DrawMapWindow.instance = nil
     ISPanel.close(self)
 end
 
+function NIM_DrawMapWindow:onGainJoypadFocus(joypadData)
+    ISPanelJoypad.onGainJoypadFocus(self, joypadData)
+    if not self.virtualCursor then
+        NIM_VirtualCursor.init(self, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
+    end
+    self:restoreJoypadFocus(joypadData)
+end
+
+function NIM_DrawMapWindow:onJoypadDown(button, joypadData)
+    if button == Joypad.BButton then
+        self.cancel:forceClick()
+        return
+    end
+    if button == Joypad.AButton and self.canDraw then
+        local focusedChild = self:getJoypadFocus()
+        if focusedChild and focusedChild.isButton and focusedChild.enable ~= false then
+            ISPanelJoypad.onJoypadDown(self, button, joypadData)
+            return
+        end
+        local cursorX, cursorY = NIM_VirtualCursor.getPosition(self)
+        if cursorX >= 20 and cursorX < 495 and cursorY >= 40 and cursorY < 415 then
+            self:paintAt(cursorX, cursorY, true)
+            return
+        end
+    end
+    ISPanelJoypad.onJoypadDown(self, button, joypadData)
+end
 
 function NIM_DrawMapWindow:open()
     local modal = NIM_DrawMapWindow:new(
@@ -372,6 +407,13 @@ function NIM_DrawMapWindow:open()
     )
     modal:initialise()
     modal:addToUIManager()
+    local playerNum = modal.character:getPlayerNum()
+    local joypadData = JoypadState.players[playerNum + 1]
+    if joypadData then
+        modal.prevFocus = getJoypadFocus(playerNum)
+        NIM_VirtualCursor.init(modal, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
+        setJoypadFocus(playerNum, modal)
+    end
 end
 
 
@@ -440,73 +482,77 @@ function NIM_DrawMapWindow:onColorSelect(color)
 
     window.greenBtn.enable = false;
     window.greenBtn.backgroundColor.a = 0.1;
+
+    if window.joyfocus then
+        window:setJoypadFocus(window.finish, window.joyfocus)
+    end
 end
 
+function NIM_DrawMapWindow:paintAt(mouseX, mouseY, virtual)
+    local isPlayerOutside = self.character:isOutside()
+    local playerCanSeeOutside = self.character:getSquare():isAdjacentToWindow()
+    local tooDark = self.character:tooDarkToRead()
+    if (not isPlayerOutside and not playerCanSeeOutside) or tooDark then
+        return
+    end
+
+    local r, g, b
+    if self.pencilColor == COLOR_BLACK then
+        r, g, b = 0.2, 0.2, 0.2
+    elseif self.pencilColor == COLOR_RED then
+        r, g, b = 1, 77/255, 77/255
+    elseif self.pencilColor == COLOR_BLUE then
+        r, g, b = 51/255, 153/255, 1
+    else
+        r, g, b = 102/255, 1, 102/255
+    end
+
+    for i = 1, #self.pixelMatrix do
+        local pixel = self.pixelMatrix[i]
+        local hit
+        if virtual then
+            hit = mouseX >= pixel.x + 20 and mouseX < pixel.x + 45
+                and mouseY >= pixel.y + 40 and mouseY < pixel.y + 65
+        else
+            hit = mouseX > pixel.x - 5 and mouseX < pixel.x + 75
+                and mouseY > pixel.y + 5 and mouseY < pixel.y + 90
+        end
+        if hit and pixel.toColor and not pixel.colored then
+            pixel.r = r
+            pixel.g = g
+            pixel.b = b
+            pixel.colored = true
+            self.coloredPixels = self.coloredPixels + 1
+            self.character:playSoundLocal("Painting")
+            if virtual then break end
+        end
+    end
+
+    if self.coloredPixels == self.pixelsToColor then
+        self.finish.enable = true
+        self.canDraw = false
+        if self.joyfocus then
+            self:setJoypadFocus(self.finish, self.joyfocus)
+        end
+    end
+end
 
 function NIM_DrawMapWindow:onTick()
     local window = NIM_DrawMapWindow.instance
+
+    if window and window.joyfocus then
+        NIM_VirtualCursor.update(window)
+    end
 
     if window == nil or not window.canDraw then
         return
     end
 
-    local isPlayerOutside = window.character:isOutside()
-    local playerCanSeeOutside = window.character:getSquare():isAdjacentToWindow()
-    local tooDark = window.character:tooDarkToRead()
-
-    if (not isPlayerOutside and not playerCanSeeOutside) or tooDark then
+    if window.joyfocus then
         return
     end
 
-    local mouseX = window:getMouseX()
-    local mouseY = window:getMouseY()
-
-    local r, g, b
-
-    if window.pencilColor == COLOR_BLACK then
-        r = 0.2;
-        g = 0.2;
-        b = 0.2;
-    elseif window.pencilColor == COLOR_RED then
-        r = 1;
-        g = 77/255;
-        b = 77/255;
-    elseif window.pencilColor == COLOR_BLUE then
-        r = 51/255;
-        g = 153/255;
-        b = 1;
-    else
-        r = 102/255;
-        g = 1;
-        b = 102/255;
-    end
-
-    local leftCollisionOffset = -5
-    local rightCollisionOffset = 75
-    local topCollisionOffset = 5
-    local bottomCollisionOffset = 90
-
-    if window.pixelMatrix ~= nil then
-        for i = 1, #window.pixelMatrix do
-            if (mouseX > window.pixelMatrix[i].x + leftCollisionOffset and mouseX < window.pixelMatrix[i].x + rightCollisionOffset) and 
-            (mouseY > window.pixelMatrix[i].y + topCollisionOffset and mouseY < window.pixelMatrix[i].y + bottomCollisionOffset) then
-                if window.pixelMatrix[i].toColor and not window.pixelMatrix[i].colored then
-                    window.pixelMatrix[i].r = r
-                    window.pixelMatrix[i].g = g
-                    window.pixelMatrix[i].b = b
-                    window.pixelMatrix[i].colored = true
-
-                    window.coloredPixels = window.coloredPixels + 1
-                    window.character:playSoundLocal("Painting")
-                end
-            end
-        end
-    end
-
-    if window.coloredPixels == window.pixelsToColor then
-        window.finish.enable = true;
-        window.canDraw = false;
-    end
+    window:paintAt(window:getMouseX(), window:getMouseY(), false)
 end
 
 Events.OnTick.Add(NIM_DrawMapWindow.onTick)
